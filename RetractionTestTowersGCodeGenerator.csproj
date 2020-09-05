@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Net.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>RetractionTestTowersGCodeGenerator</RootNamespace>
+    <AssemblyName>RetractionTestTowersGCodeGenerator</AssemblyName>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="RetractionTest.gcode" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Retraction Test Towers Template.gcode" />
+  </ItemGroup>
+</Project>
+  
