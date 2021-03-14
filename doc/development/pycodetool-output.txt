@@ -1,3 +1,5 @@
+## SpaceString.py
+```
 :~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py SpaceString.py SpaceString.py doc/development/pycodetool-SpaceString-identifiers.txt
 I am python_remove_dotnet.py
   ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
@@ -15,6 +17,10 @@ I am python_remove_dotnet.py
   (STATUS) line 3: started class SpaceString cache index [0]
   (STATUS) save_identifier_lists...
   (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-SpaceString-identifiers.txt')
+```
+
+## CommandCache.py
+```
 :~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py CommandCache.py CommandCache.py doc/development/pycodetool-CommandCache-identifiers.txt
 I am python_remove_dotnet.py
   ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
@@ -35,6 +41,11 @@ I am python_remove_dotnet.py
   (SOURCE) line 6: (source error removing net framework) expected '=' then value after class member
   (STATUS) save_identifier_lists...
   (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-CommandCache-identifiers.txt')
+```
+
+
+## GCodeCommand.py
+```
 :~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommand.py GCodeCommand.py doc/development/pycodetool-GCodeCommand-identifiers.txt
 I am python_remove_dotnet.py
   ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
@@ -58,6 +69,11 @@ I am python_remove_dotnet.py
   (CHANGE) line 10: (changing) using ' is not None' instead of ' != None'
   (STATUS) save_identifier_lists...
   (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommand-identifiers.txt')
+```
+
+
+## GCodeCommandPart.py
+```
 :~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPart.py GCodeCommandPart.py doc/development/pycodetool-GCodeCommandPart-identifiers.txt
 I am python_remove_dotnet.py
   ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
@@ -80,6 +96,10 @@ I am python_remove_dotnet.py
   (STATUS) line 6: started class GCodeCommandPart cache index [0]
   (STATUS) save_identifier_lists...
   (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPart-identifiers.txt')
+```
+
+## GCodeCommandPartType.py
+```
 :~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPartType.py GCodeCommandPartType.py doc/development/pycodetool-GCodeCommandPartType-identifiers.txt
 I am python_remove_dotnet.py
   ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
@@ -93,4 +113,42 @@ I am python_remove_dotnet.py
   (STATUS) removing net framework...
   (STATUS) save_identifier_lists...
   (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPartType-identifiers.txt')
-:~/git/RetractionTestTowersGCodeGenerator$
+```
+
+
+## Program.py
+```
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py Program.py Program.py doc/development/pycodetool-Program-identifiers.txtI am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: Program.py
+  output file: Program.py
+  identifier list output file: c
+  (STATUS) 19 line(s) detected
+
+  (STATUS) preprocessing...
+  (STATUS) line 6: started class Program cache index [0]
+  (SOURCE) line 10: (source error preprocessing) expected '=' then value after class member
+  (STATUS) line 10: started class CurvePointType cache index [1]
+  (SOURCE) line 11: source WARNING: (automatically corrected) duplicate '__init__' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (STATUS) line 13: -->ended class CurvePointType (near '    class CurvePoint(object):')
+  (STATUS) line 13: started class CurvePoint cache index [2]
+  (SOURCE) line 14: source WARNING: (automatically corrected) duplicate '__init__' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (STATUS) line 16: -->ended class CurvePoint (near '    def GetTemplateReader():')
+  (SOURCE) line 16: source WARNING: (automatically corrected) duplicate 'GetTemplateReader' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+
+  (STATUS) removing net framework...
+  (CHANGE) line 2: commenting useless line since imports framework
+  (CHANGE) line 3: commenting useless line since imports framework
+  (CHANGE) line 4: commenting useless line since imports framework
+  (CHANGE) line 6: removing 'object' inheritance since needs .net framework
+  (STATUS) line 6: started class Program cache index [0]
+  (SOURCE) line 10: (source error removing net framework) expected '=' then value after class member
+  (CHANGE) line 10: removing 'object' inheritance since needs .net framework
+  (STATUS) line 10: started class CurvePointType cache index [1]
+  (STATUS) line 13: -->ended class CurvePointType (near '    class CurvePoint(object):')
+  (CHANGE) line 13: removing 'object' inheritance since needs .net framework
+  (STATUS) line 13: started class CurvePoint cache index [2]
+  (STATUS) line 19: -->ended class CurvePoint (near '    GetTemplateReader = staticmethod(GetTemplateReader)')
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-Program-identifiers.txt')
+```

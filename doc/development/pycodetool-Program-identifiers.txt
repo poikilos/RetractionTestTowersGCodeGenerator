@@ -1,0 +1,9 @@
+Program.py
+  custom_types:
+    Program
+    CurvePointType
+    CurvePoint
+  symbols:
+      Program._FirstTowerZ  # = (no value specified)  # from line 8
+  functions:
+      Program.__init__
