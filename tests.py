@@ -125,6 +125,10 @@ for part in GCodeCommandPart.ParseStringToParts("M70"):
     # assertEqual(part, good_parts[i])
 assertPartsAllEqual(good_parts, got_parts)
 
+line = "G00 X25 Y20"
+command = GCodeCommand(line)
+assertEqual(command.Command, "G00")
+
 ex = Extent()
 ex.From = 1.0
 ex.To = 3.0

@@ -40,10 +40,10 @@ class GCodeCommandPart:
             GCodeCommandPartType.Comment
     '''
     def __init__(self, **kwargs):
-        self.Type = None
-        self.Character = None
-        self.Number = None
-        self.Text = None
+        self.Type = kwargs.get("Type")
+        self.Character = kwargs.get("Character")
+        self.Number = kwargs.get("Number")
+        self.Text = kwargs.get("Text")
 
     def ToString(self):
         if self.Type == GCodeCommandPartType.Space:
@@ -77,10 +77,10 @@ class GCodeCommandPart:
         index = 0
         while index < len(line):
             if line[index] == ';':
-                tmp = GCodeCommandPart()
-                tmp.Type = GCodeCommandPartType.Comment
-                tmp.Text = line[index + 1:]
-                yield tmp
+                yield GCodeCommandPart(
+                    Type=GCodeCommandPartType.Comment,
+                    Text=line[index + 1:],
+                )
                 raise StopIteration
             if IsSpace(line[index]):
                 count = 1
@@ -88,14 +88,15 @@ class GCodeCommandPart:
                 while (index < len(line)) and IsSpace(line, index):
                     count += 1
                     index += 1
-                tmp = GCodeCommandPart()
-                tmp.Type = GCodeCommandPartType.Space
-                tmp.Number = count
-                yield tmp
+                yield GCodeCommandPart(
+                    Type=GCodeCommandPartType.Space,
+                    Number=count,
+                )
             else:
-                part = GCodeCommandPart()
-                part.Type = GCodeCommandPartType.CharacterAndNumber
-                part.Character = line[index]
+                part = GCodeCommandPart(
+                    Type=GCodeCommandPartType.CharacterAndNumber,
+                    Character=line[index],
+                )
                 index += 1
                 numberStart = index
                 while ((index < len(line))
@@ -117,15 +118,15 @@ class GCodeCommandPart:
                         count += 1
                         index += 1
 
-                    tmp = GCodeCommandPart()
-                    tmp.Type = GCodeCommandPartType.Space
-                    tmp.Number = count
-                    yield tmp
+                    yield GCodeCommandPart(
+                        Type=GCodeCommandPartType.Space,
+                        Number=count,
+                    )
 
                     if index < len(line):
-                        tmp = GCodeCommandPart()
-                        tmp.Type = GCodeCommandPartType.Text
-                        tmp.Text = line[index:]
-                        yield tmp
+                        yield GCodeCommandPart(
+                            Type=GCodeCommandPartType.Text,
+                            Text=line[index:],
+                        )
                     raise StopIteration
         # TODO: raise StopIteration?
