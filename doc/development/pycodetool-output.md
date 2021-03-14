@@ -1,8 +1,11 @@
+# pycodetool output
+This output is from the command shown in the first line of each code block. The home directory was redacted as `~` to be more generic.
+
 ## SpaceString.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py SpaceString.py SpaceString.py doc/development/pycodetool-SpaceString-identifiers.txt
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py SpaceString.py SpaceString.py doc/development/pycodetool-SpaceString-identifiers.txt
 I am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: SpaceString.py
   output file: SpaceString.py
   identifier list output file: c
@@ -16,14 +19,14 @@ I am python_remove_dotnet.py
   (CHANGE) line 3: removing 'object' inheritance since needs .net framework
   (STATUS) line 3: started class SpaceString cache index [0]
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-SpaceString-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-SpaceString-identifiers.txt')
 ```
 
 ## CommandCache.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py CommandCache.py CommandCache.py doc/development/pycodetool-CommandCache-identifiers.txt
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py CommandCache.py CommandCache.py doc/development/pycodetool-CommandCache-identifiers.txt
 I am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: CommandCache.py
   output file: CommandCache.py
   identifier list output file: c
@@ -40,15 +43,15 @@ I am python_remove_dotnet.py
   (STATUS) line 5: started class CommandCache cache index [0]
   (SOURCE) line 6: (source error removing net framework) expected '=' then value after class member
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-CommandCache-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-CommandCache-identifiers.txt')
 ```
 
 
 ## GCodeCommand.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommand.py GCodeCommand.py doc/development/pycodetool-GCodeCommand-identifiers.txt
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommand.py GCodeCommand.py doc/development/pycodetool-GCodeCommand-identifiers.txt
 I am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: GCodeCommand.py
   output file: GCodeCommand.py
   identifier list output file: c
@@ -68,15 +71,15 @@ I am python_remove_dotnet.py
   (STATUS) line 6: started class GCodeCommand cache index [0]
   (CHANGE) line 10: (changing) using ' is not None' instead of ' != None'
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommand-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommand-identifiers.txt')
 ```
 
 
 ## GCodeCommandPart.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPart.py GCodeCommandPart.py doc/development/pycodetool-GCodeCommandPart-identifiers.txt
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPart.py GCodeCommandPart.py doc/development/pycodetool-GCodeCommandPart-identifiers.txt
 I am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: GCodeCommandPart.py
   output file: GCodeCommandPart.py
   identifier list output file: c
@@ -95,14 +98,14 @@ I am python_remove_dotnet.py
   (CHANGE) line 6: removing 'object' inheritance since needs .net framework
   (STATUS) line 6: started class GCodeCommandPart cache index [0]
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPart-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPart-identifiers.txt')
 ```
 
 ## GCodeCommandPartType.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPartType.py GCodeCommandPartType.py doc/development/pycodetool-GCodeCommandPartType-identifiers.txt
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPartType.py GCodeCommandPartType.py doc/development/pycodetool-GCodeCommandPartType-identifiers.txt
 I am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: GCodeCommandPartType.py
   output file: GCodeCommandPartType.py
   identifier list output file: c
@@ -112,14 +115,14 @@ I am python_remove_dotnet.py
 
   (STATUS) removing net framework...
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPartType-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPartType-identifiers.txt')
 ```
 
 
 ## Program.py
 ```
-:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py Program.py Program.py doc/development/pycodetool-Program-identifiers.txtI am python_remove_dotnet.py
-  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+:~/git/RetractionTestTowersGCodeGenerator$ ~/git/pycodetool/pycodetool/python_remove_dotnet.py Program.py Program.py doc/development/pycodetool-Program-identifiers.txtI am python_remove_dotnet.py
+  ignoring arg:~/git/pycodetool/pycodetool/python_remove_dotnet.py
   input file: Program.py
   output file: Program.py
   identifier list output file: c
@@ -150,5 +153,5 @@ I am python_remove_dotnet.py
   (STATUS) line 13: started class CurvePoint cache index [2]
   (STATUS) line 19: -->ended class CurvePoint (near '    GetTemplateReader = staticmethod(GetTemplateReader)')
   (STATUS) save_identifier_lists...
-  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-Program-identifiers.txt')
+  (STATUS) OK (save_identifier_lists to '~/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-Program-identifiers.txt')
 ```
