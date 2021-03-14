@@ -4,16 +4,16 @@ from System.IO import *
 from System.Linq import *
 
 class Program(object):
-	def __init__(self):
-		self._FirstTowerZ = 2.1m
+    def __init__(self):
+        self._FirstTowerZ = 2.1m
 
-	class CurvePointType(object):
-		def __init__(self):
+    class CurvePointType(object):
+        def __init__(self):
 
-	class CurvePoint(object):
-		def __init__(self):
+    class CurvePoint(object):
+        def __init__(self):
 
-	def GetTemplateReader():
-		pass
+    def GetTemplateReader():
+        pass
 
-	GetTemplateReader = staticmethod(GetTemplateReader)
+    GetTemplateReader = staticmethod(GetTemplateReader)
