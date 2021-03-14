@@ -7,7 +7,9 @@
 # from System.Linq import *
 import sys
 import os
+from GCodeCommandPart import IsSpace
 
+digits = "0123456789"
 
 def IsNullOrWhiteSpace(s):
     if s is None:
@@ -52,6 +54,28 @@ class CurvePoint:
         self.Z = kwargs.get('Z')
         self.Retraction = kwargs.get('Retraction')
 
+    @staticmethod
+    def compare(l, r):
+        return l.Z - r.Z
+
+    def __lt__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) < 0
+
+    def __gt__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) > 0
+
+    def __eq__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) == 0
+
+    def __le__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) <= 0
+
+    def __ge__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) >= 0
+
+    def __ne__(self, other):
+        return CurvePoint.compare(self.Z, other.Z) != 0
+
 
 class GCodeWriter:
     def __init__(self, underlying):
@@ -73,44 +97,36 @@ class GCodeWriter:
         self._underlying.write(command + "\n")
 
     @staticmethod
-    def IsCommand(line)
-        for (i = 0; i < len(line); i++)
-            if char.IsWhiteSpace(line, i:
+    def IsCommand(line):
+        i = -1
+        while i + 1 < len(line):
+            i += 1
+            if IsSpace(line, i):
                 continue
-
             if line[i] == ';':
                 break
-
-            if (line[i] == 'G') or (line[i] == 'M':
+            if (line[i] == 'G') or (line[i] == 'M'):
                 i += 1
                 if i >= len(line):
                     return False
-
-                return char.IsDigit(line[i])
-
+                return line[i] in digits
         return False
 
     @staticmethod
-    def IsMovementCommand(command)
-        for (i = 0; i < len(command); i++)
-            if char.IsWhiteSpace(command, i:
+    def IsMovementCommand(command):
+        for i in range(len(command)):
+            if IsSpace(command, i):
                 continue
-
             if command[i] == ';':
                 break
-
             if command[i] == 'G':
                 i += 1
                 if i >= len(command):
                     return False
-
-                if (command[i] != '0') and (command[i] != '1':
+                if (command[i] != '0') and (command[i] != '1'):
                     return False
-
                 i += 1
-
-                return (i >= len(command)) || char.IsWhiteSpace(command[i])
-
+                return (i >= len(command)) or IsSpace(command[i])
         return False
 
 
@@ -119,6 +135,10 @@ class Program:
     FirstTowerZ = 2.1
     TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    @property
+    def GraphRowHeight(self):
+        return 0.5
 
     @staticmethod
     def GetTemplateReader():
@@ -129,7 +149,7 @@ class Program:
         return open(template_path)
 
     @staticmethod
-    def MeasureGCode(stream)
+    def MeasureGCode(stream):
         #  Count only G1 moves in X and Y.
         #  Count G0 and G1 moves in Z, but only for Z values where filament is extruded.
         x = Extent()
@@ -138,7 +158,6 @@ class Program:
 
         x.From = y.From = z.From = sys.float_info.max
         x.To = y.To = z.To = sys.float_info.min
-
         lastE = sys.float_info.min
         currentZ = sys.float_info.min
 
@@ -155,27 +174,27 @@ class Program:
             command = GCodeCommand(line)
 
             if command.Command == "G1":
-                if command.HasParameter('X':
+                if command.HasParameter('X'):
                     x.Extend(command.GetParameter('X'))
-                if command.HasParameter('Y':
+                if command.HasParameter('Y'):
                     y.Extend(command.GetParameter('Y'))
 
-            if (command.Command == "G0") or (command.Command == "G1":
-                if command.HasParameter('Z':
+            if (command.Command == "G0") or (command.Command == "G1"):
+                if command.HasParameter('Z'):
                     currentZ = command.GetParameter('Z')
 
-                if command.HasParameter('E':
-                    decimal e = command.GetParameter('E')
+                if command.HasParameter('E'):
+                    e = command.GetParameter('E')
 
-                    if (e > lastE) and (currentZ != decimal.MinValue:
+                    if (e > lastE) and (currentZ != sys.float_info.min):
                         lastE = e
                         z.Extend(currentZ)
 
         return (x, y, z)
 
     @classmethod
-    def Main(cls, args)
-        extents = MeasureGCode(Program.GetTemplateReader())
+    def Main(cls, args):
+        extents = Program.MeasureGCode(Program.GetTemplateReader())
 
         print("Template extents:")
 
@@ -192,7 +211,7 @@ class Program:
         outputFileName = "RetractionTest.gcode"
 
         if len(args) == 0:
-            curvePoints.Add(
+            curvePoints.append(
                 CurvePoint(
                     PointType = CurvePointType.SameValueUntil,
                     Z = FirstTowerZ,
@@ -200,7 +219,7 @@ class Program:
                 )
             )
 
-            curvePoints.Add(
+            curvePoints.append(
                 CurvePoint(
                     PointType = CurvePointType.InterpolateUpTo,
                     Z = extents.Z.To,
@@ -214,111 +233,101 @@ class Program:
             while index < len(args):
                 curvePoint = CurvePoint()
 
-                argName = args[index].ToLowerInvariant()
+                argName = args[index].lower()
 
-                switch (argName)
-                    case "/output":
-                        outputFileName = args[index + 1]
-                        index += 1
+                if argName == "/output":
+                    outputFileName = args[index + 1]
+                    index += 1
 
-                        continue
-                    case "/center":
-                        deltaX = decimal.Parse(args[index + 1]) - extents.X.Middle
-                        deltaY = decimal.Parse(args[index + 2]) - extents.Y.Middle
+                    continue
+                elif argName == "/center":
+                    deltaX = float(args[index + 1]) - extents.X.Middle
+                    deltaY = float(args[index + 2]) - extents.Y.Middle
 
-                        index += 3
+                    index += 3
 
-                        continue
-                    case "/startwith":
-                        initialPoint = CurvePoint()
+                    continue
+                elif argName == "/startwith":
+                    initialPoint = CurvePoint()
 
-                        initialPoint.PointType = CurvePointType.SameValueUntil
-                        initialPoint.Z = FirstTowerZ
-                        initialPoint.Retraction = decimal.Parse(args[index + 1])
+                    initialPoint.PointType = CurvePointType.SameValueUntil
+                    initialPoint.Z = FirstTowerZ
+                    initialPoint.Retraction = float(args[index + 1])
 
-                        curvePoints.Add(initialPoint)
+                    curvePoints.append(initialPoint)
 
-                        index += 2
+                    index += 2
 
-                        continue
-                    case "/setat":
-                    case "/interpolateto":
-                        switch (argName)
-                            case "/setat": curvePoint.PointType = CurvePointType.SameValueUntil; break
-                            case "/interpolateto": curvePoint.PointType = CurvePointType.InterpolateUpTo; break
+                    continue
+                elif ((argName == "/setat")
+                        or (argName == "/interpolateto")):
+                    if argName == "/setat":
+                        curvePoint.PointType = CurvePointType.SameValueUntil
+                    else:
+                        curvePoint.PointType = CurvePointType.InterpolateUpTo
 
-                        curvePoint.Z = decimal.Parse(args[index + 1])
-                        curvePoint.Retraction = decimal.Parse(args[index + 2])
+                    curvePoint.Z = float(args[index + 1])
+                    curvePoint.Retraction = float(args[index + 2])
+                    curvePoints.append(curvePoint)
+                    index += 3
+                    continue
 
-                        curvePoints.Add(curvePoint)
-
-                        index += 3
-
-                        continue
-
-                    case "/checkfile":
-                        AnalyzeFile(args[index + 1])
-
-                        return
+                elif argName == "/checkfile":
+                    Program.AnalyzeFile(args[index + 1])
+                    return
 
                 raise Exception("Invalid command-line format")
 
         print("")
 
-        if (deltaX != 0) or (deltaY != 0:
+        if (deltaX != 0) or (deltaY != 0):
             print(
-                "Will translate test print to be centred at ({0:##0.0}, {1:##0.0})",
-                extents.X.Middle + deltaX,
-                extents.Y.Middle + deltaY)
+                "Will translate test print to be centred at ({0:##0.0}"
+                ", {1:##0.0})".format(
+                    extents.X.Middle + deltaX,
+                    extents.Y.Middle + deltaY,
+                )
+            )
             print("")
 
         print("Z    ? Retraction")
 
         lastCurvePointsPassed = 0
 
-        const decimal GraphRowHeight = 0.5m
-
-        for (decimal z = 17.0m; z >= FirstTowerZ - GraphRowHeight; z -= GraphRowHeight)
+        z = 17.0
+        while z >= FirstTowerZ - self.GraphRowHeight:
             lastExtraRow = False
-
             if z < FirstTowerZ:
                 lastExtraRow = True
                 z = FirstTowerZ
-
-            sys.stdout.write(z.ToString("#0.0").PadLeft(4))
+            sys.stdout.write(z.ToString("#0.0").rjust(4))
             sys.stdout.write(' ')
-
-            curvePointsPassed = curvePoints.Count(point => point.Z >= z)
-
+            curvePointsPassed = \
+                sum(1 for point in curvePoints if point.Z >= z)
             if curvePointsPassed == lastCurvePointsPassed:
                 sys.stdout.write("  ")
             else:
                 sys.stdout.write("+ ")
                 lastCurvePointsPassed = curvePointsPassed
-
-            retraction = GetRetractionForZ(z, curvePoints)
-
-            sys.stdout.write(retraction.ToString("#0.0000 ").PadLeft(8))
-
-            barWidth = (int)Math.Round(retraction * 5m)
-
-            for (i = 0; i < barWidth; i++)
+            retraction = Program.GetRetractionForZ(z, curvePoints)
+            sys.stdout.write(retraction.ToString("#0.0000 ").rjust(8))
+            barWidth = int(round(retraction * 5))
+            for i in range(barWidth):
                 sys.stdout.write('*')
-
             print("")
-
             if lastExtraRow:
                 break
+            z -= self.GraphRowHeight
 
         print("")
-        print("Will write output to: {0}", outputFileName)
+        print("Will write output to: {0}".format(outputFileName))
 
         with open(outputFileName, 'w') as writer:
             print("")
             print("Generating G code...")
 
-            TranslateGCode(
-                GetTemplateReader(),
+            Program.TranslateGCode(
+                Program.GetTemplateReader(),
                 writer,
                 FirstTowerZ,
                 deltaX,
@@ -327,13 +336,13 @@ class Program:
             )
 
         print("")
-        print(Path.GetFullPath(outputFileName))
+        print(os.path.abspath(outputFileName))
 
     @staticmethod
     def AnalyzeFile(fileName):
-       with open(fileName, 'r') as reader:
-            decimal z = decimal.MinValue
-            decimal lastE = decimal.MinValue
+        with open(fileName, 'r') as reader:
+            z = sys.float_info.min
+            lastE = sys.float_info.min
 
             # CHECK NEXT LINE for type declarations !!!
             while True:
@@ -344,20 +353,21 @@ class Program:
 
                 command = GCodeCommand(line)
 
-                if (command.Command == "G0") or (command.Command == "G1":
-                    if command.HasParameter('Z':
+                if (command.Command == "G0") or (command.Command == "G1"):
+                    if command.HasParameter('Z'):
                         z = command.GetParameter('Z')
 
-                    if command.HasParameter('E':
+                    if command.HasParameter('E'):
                         e = command.GetParameter('E')
 
                         if e < lastE:
-                            print($"=> Retract by {lastE - e} at Z {z}")
+                            print("=> Retract by {lastE - e} at Z {z}"
+                                  "".format(lastE=lastE,e=e,z=z))
                         else:
                             lastE = e
 
     @staticmethod
-    def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY, curvePoints)
+    def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY, curvePoints):
         if not isinstance(firstTowerZ, float):
             raise ValueError("The firstTowerZ must be an float but"
                              " is \"{}\".".format(firstTowerZ))
@@ -365,14 +375,13 @@ class Program:
             raise ValueError("The curvePoints must be a list but"
                              " is \"{}\".".format(curvePoints))
 
-        curvePoints.Sort(
-            (left, right) => left.Z.CompareTo(right.Z))
+        curvePoints = sorted(curvePoints)
 
-        decimal z = decimal.MinValue
+        z = sys.float_info.min
 
         uniqueZValues = set()
 
-        decimal lastE = decimal.MinValue
+        lastE = sys.float_info.min
 
         lastSerialMessage = ""
 
@@ -389,32 +398,37 @@ class Program:
 
             command = GCodeCommand(line)
 
-            if (command.Command == "G0") or (command.Command == "G1":
-                if command.HasParameter('X':
+            if (command.Command == "G0") or (command.Command == "G1"):
+                if command.HasParameter('X'):
                     command.SetParameter('X', command.GetParameter('X') + deltaX)
-                if command.HasParameter('Y':
+                if command.HasParameter('Y'):
                     command.SetParameter('Y', command.GetParameter('Y') + deltaY)
 
-                if command.HasParameter('Z':
+                if command.HasParameter('Z'):
                     z = command.GetParameter('Z')
 
-                    if uniqueZValues.Add(z:
+                    if uniqueZValues.append(z):
                         sys.stdout.write('#')
 
                 if z >= firstTowerZ:
-                    if command.HasParameter('E':
-                        decimal e = command.GetParameter('E')
+                    if command.HasParameter('E'):
+                        e = command.GetParameter('E')
 
                         if e < lastE:
                             #  Retraction!
                             numberOfRetractions += 1
 
-                            decimal retraction = GetRetractionForZ(z, curvePoints)
+                            retraction = Program.GetRetractionForZ(z, curvePoints)
 
                             command.SetParameter('E', lastE - retraction)
 
-                            lcdScreenMessage = $"dE {retraction:0.000} at Z {z:#0.0}"
-                            serialMessage = $"Retraction {retraction:0.00000} at Z {z:#0.0}"
+                            lcdScreenMessage = (
+                                "dE {retraction:0.000} at Z {z:#0.0}"
+                            ).format(retraction=retraction, z=z)
+                            serialMessage = (
+                                "Retraction {retraction:0.00000}"
+                                " at Z {z:#0.0}"
+                            ).format(retraction=retraction, z=z)
 
                             gcodeWriter.WriteLine("M117 " + lcdScreenMessage)
 
@@ -432,15 +446,15 @@ class Program:
         print("")
         print("")
         print("Output:")
-        print("- {0} characters", gcodeWriter.NumCharactersWritten)
-        print("- {0} lines", gcodeWriter.NumLines)
-        print("- {0} commands", gcodeWriter.NumCommands)
-        print("- {0} movement commands", gcodeWriter.NumMovementCommands)
-        print("- {0} unique Z values", uniqueZValues.Count)
-        print("- {0} retractions", numberOfRetractions)
+        print("- {0} characters".format(gcodeWriter.NumCharactersWritten))
+        print("- {0} lines".format(gcodeWriter.NumLines))
+        print("- {0} commands".format(gcodeWriter.NumCommands))
+        print("- {0} movement commands".format(gcodeWriter.NumMovementCommands))
+        print("- {0} unique Z values".format(uniqueZValues.Count))
+        print("- {0} retractions".format(numberOfRetractions))
 
     @staticmethod
-    def GetRetractionForZ(z, curvePoints)
+    def GetRetractionForZ(z, curvePoints):
         if not isinstance(z, float):
             raise ValueError("The z must be an float but"
                              " is \"{}\".".format(z))
@@ -455,22 +469,22 @@ class Program:
                 if point.PointType == CurvePointType.SameValueUntil:
                     return previousPoint.Retraction
 
-                decimal interpolateFrom = previousPoint.Retraction
-                decimal interpolateTo = point.Retraction
+                interpolateFrom = previousPoint.Retraction
+                interpolateTo = point.Retraction
 
-                decimal interpolateFromZ = previousPoint.Z
-                decimal interpolateToZ = point.Z
+                interpolateFromZ = previousPoint.Z
+                interpolateToZ = point.Z
 
-                decimal interpolateRange = interpolateToZ - interpolateFromZ
+                interpolateRange = interpolateToZ - interpolateFromZ
 
-                decimal weightTo = (z - previousPoint.Z) / interpolateRange
-                decimal weightFrom = (point.Z - z) / interpolateRange
+                weightTo = (z - previousPoint.Z) / interpolateRange
+                weightFrom = (point.Z - z) / interpolateRange
 
                 return interpolateFrom * weightFrom + interpolateTo * weightTo
 
             previousPoint = point
 
-        return curvePoints.Last().Retraction
+        return curvePoints[-1].Retraction
 
 
 if __name__ == "__main__":

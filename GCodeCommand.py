@@ -8,6 +8,13 @@
 
 import sys
 
+from GCodeCommandPart import (
+    GCodeCommandPart,
+)
+
+from GCodeCommandPartType import GCodeCommandPartType
+from CommandCache import CommandCache
+
 
 class GCodeCommand:
 
@@ -22,8 +29,12 @@ class GCodeCommand:
         if firstPart is not None:
             self.CommandType = firstPart.Character
             self.CommandNumber = firstPart.Number
-            self.Command = CommandCache.Get(self.CommandType,
-                                             self.CommandNumber)
+            try:
+                self.Command = CommandCache.Get(self.CommandType,
+                                                self.CommandNumber)
+            except Exception as e:
+                print("line: `{}`".format(line))
+                raise e
 
     def ToString(self):
         result = ""

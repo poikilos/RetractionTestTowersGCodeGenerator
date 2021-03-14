@@ -4,8 +4,13 @@ from GCodeCommandPart import (
     IsSpace,
 )
 
+from GCodeCommand import (
+    GCodeCommand,
+)
+
 from Program import (
     Extent,
+    CurvePoint,
 )
 
 def toPythonLiteral(v):
@@ -137,5 +142,58 @@ ex.Extend(0.0)
 assertEqual(ex.Middle, 1.5)
 ex.Extend(5.0)
 assertEqual(ex.Middle, 2.5)
+
+curvePoints = []
+curvePoints.append(
+    CurvePoint(
+        PointType = CurvePointType.SameValueUntil,
+        Z = 3.0,
+        Retraction = 2.0,
+    )
+)
+curvePoints.append(
+    CurvePoint(
+        PointType = CurvePointType.SameValueUntil,
+        Z = 1.0,
+        Retraction = 3.0,
+    )
+)
+curvePoints.append(
+    CurvePoint(
+        PointType = CurvePointType.SameValueUntil,
+        Z = 2.0,
+        Retraction = 1.0,
+    )
+)
+curvePoints = sorted(curvePoints)
+assertEqual(curvePoints[0].Z, 1.0)
+assertEqual(curvePoints[1].Z, 2.0)
+assertEqual(curvePoints[2].Z, 3.0)
+
+
+lastE = 3
+e = 1
+z = .32
+s = "=> Retract by {lastE - e} at Z {z}".format(
+    lastE=lastE,
+    z=z,
+    e=e,
+)
+assertEqual(s, "=> Retract by "+str(lastE-e)+" at Z "+str(z))
+
+z = 1.5
+curvePointsPassed = \
+    sum(1 for point in curvePoints if point.Z >= z)
+assertEqual(curvePointsPassed, 2)
+
+z = -1
+curvePointsPassed = \
+    sum(1 for point in curvePoints if point.Z >= z)
+assertEqual(curvePointsPassed, 3)
+
+z = 3.0
+curvePointsPassed = \
+    sum(1 for point in curvePoints if point.Z >= z)
+assertEqual(curvePointsPassed, 3)
 
 print("All tests passed.")
