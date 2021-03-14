@@ -1,0 +1,8 @@
+SpaceString.py
+  custom_types:
+    SpaceString
+  symbols:
+      SpaceString._s_cache  # = (no value specified)  # from line 5
+      staticmethod SpaceString.OfLength =  staticmethod(OfLength)  # from line 12
+  functions:
+      SpaceString.__init__

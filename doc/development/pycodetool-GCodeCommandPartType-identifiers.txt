@@ -1,0 +1,5 @@
+GCodeCommandPartType.py
+  custom_types:
+  symbols:
+  functions:
+    __init__

@@ -1,0 +1,7 @@
+GCodeCommandPart.py
+  custom_types:
+    GCodeCommandPart
+  symbols:
+      staticmethod GCodeCommandPart.ParseStringToParts =  staticmethod(ParseStringToParts)  # from line 64
+  functions:
+      GCodeCommandPart.__init__

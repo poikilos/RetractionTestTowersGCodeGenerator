@@ -1,0 +1,96 @@
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py SpaceString.py SpaceString.py doc/development/pycodetool-SpaceString-identifiers.txt
+I am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: SpaceString.py
+  output file: SpaceString.py
+  identifier list output file: c
+  (STATUS) 12 line(s) detected
+
+  (STATUS) preprocessing...
+  (STATUS) line 3: started class SpaceString cache index [0]
+  (SOURCE) line 7: source WARNING: (automatically corrected) duplicate 'OfLength' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+
+  (STATUS) removing net framework...
+  (CHANGE) line 3: removing 'object' inheritance since needs .net framework
+  (STATUS) line 3: started class SpaceString cache index [0]
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-SpaceString-identifiers.txt')
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py CommandCache.py CommandCache.py doc/development/pycodetool-CommandCache-identifiers.txt
+I am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: CommandCache.py
+  output file: CommandCache.py
+  identifier list output file: c
+  (STATUS) 6 line(s) detected
+
+  (STATUS) preprocessing...
+  (STATUS) line 5: started class CommandCache cache index [0]
+  (SOURCE) line 6: (source error preprocessing) expected '=' then value after class member
+
+  (STATUS) removing net framework...
+  (CHANGE) line 2: commenting useless line since imports framework
+  (CHANGE) line 3: commenting useless line since imports framework
+  (CHANGE) line 5: removing 'object' inheritance since needs .net framework
+  (STATUS) line 5: started class CommandCache cache index [0]
+  (SOURCE) line 6: (source error removing net framework) expected '=' then value after class member
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-CommandCache-identifiers.txt')
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommand.py GCodeCommand.py doc/development/pycodetool-GCodeCommand-identifiers.txt
+I am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: GCodeCommand.py
+  output file: GCodeCommand.py
+  identifier list output file: c
+  (STATUS) 30 line(s) detected
+
+  (STATUS) preprocessing...
+  (STATUS) line 6: started class GCodeCommand cache index [0]
+  (SOURCE) line 15: source WARNING: (automatically corrected) duplicate 'ToString' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (SOURCE) line 23: source WARNING: (automatically corrected) duplicate 'WriteTo' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (SOURCE) line 29: source WARNING: (automatically corrected) duplicate 'HasParameter' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+
+  (STATUS) removing net framework...
+  (CHANGE) line 2: commenting useless line since imports framework
+  (CHANGE) line 3: commenting useless line since imports framework
+  (CHANGE) line 4: commenting useless line since imports framework
+  (CHANGE) line 6: removing 'object' inheritance since needs .net framework
+  (STATUS) line 6: started class GCodeCommand cache index [0]
+  (CHANGE) line 10: (changing) using ' is not None' instead of ' != None'
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommand-identifiers.txt')
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPart.py GCodeCommandPart.py doc/development/pycodetool-GCodeCommandPart-identifiers.txt
+I am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: GCodeCommandPart.py
+  output file: GCodeCommandPart.py
+  identifier list output file: c
+  (STATUS) 64 line(s) detected
+
+  (STATUS) preprocessing...
+  (STATUS) line 6: started class GCodeCommandPart cache index [0]
+  (SOURCE) line 9: source WARNING: (automatically corrected) duplicate 'ToString' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (SOURCE) line 21: source WARNING: (automatically corrected) duplicate 'WriteTo' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+  (SOURCE) line 33: source WARNING: (automatically corrected) duplicate 'ParseStringToParts' method starting on line--commenting since redundant (you may need to fix this by hand if this overload has code you needed).
+
+  (STATUS) removing net framework...
+  (CHANGE) line 2: commenting useless line since imports framework
+  (CHANGE) line 3: commenting useless line since imports framework
+  (CHANGE) line 4: commenting useless line since imports framework
+  (CHANGE) line 6: removing 'object' inheritance since needs .net framework
+  (STATUS) line 6: started class GCodeCommandPart cache index [0]
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPart-identifiers.txt')
+:~/git/RetractionTestTowersGCodeGenerator$ /home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py GCodeCommandPartType.py GCodeCommandPartType.py doc/development/pycodetool-GCodeCommandPartType-identifiers.txt
+I am python_remove_dotnet.py
+  ignoring arg:/home/owner/git/pycodetool/pycodetool/python_remove_dotnet.py
+  input file: GCodeCommandPartType.py
+  output file: GCodeCommandPartType.py
+  identifier list output file: c
+  (STATUS) 2 line(s) detected
+
+  (STATUS) preprocessing...
+
+  (STATUS) removing net framework...
+  (STATUS) save_identifier_lists...
+  (STATUS) OK (save_identifier_lists to '/home/owner/git/RetractionTestTowersGCodeGenerator/doc/development/pycodetool-GCodeCommandPartType-identifiers.txt')
+:~/git/RetractionTestTowersGCodeGenerator$

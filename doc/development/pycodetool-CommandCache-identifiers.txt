@@ -1,0 +1,5 @@
+CommandCache.py
+  custom_types:
+    CommandCache
+  symbols:
+  functions:

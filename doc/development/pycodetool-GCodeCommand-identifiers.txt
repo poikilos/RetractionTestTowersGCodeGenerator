@@ -1,0 +1,9 @@
+GCodeCommand.py
+  custom_types:
+    GCodeCommand
+  symbols:
+      GCodeCommand._CommandType  # = (no value specified)  # from line 11
+      GCodeCommand._CommandNumber  # = (no value specified)  # from line 12
+      GCodeCommand._Command  # = (no value specified)  # from line 13
+  functions:
+      GCodeCommand.__init__
