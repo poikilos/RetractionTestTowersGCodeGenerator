@@ -7,11 +7,25 @@ import sys
 
 
 class SpaceString:
+    '''
+    This is not necessary since Python has better ways of doing this
+    (' ' * length).
+    This is kept only for type checking purposes.
+    '''
+    _s_cache = {}
+
     def __init__(self):
-        self._s_cache = Dictionary[int, str]()
+        pass
+
+    @classmethod
+    def _cache(cls, length):
+        if not isinstance(length, int):
+            raise ValueError("The length must be an int but"
+                             " is \"{}\".".format(length))
+        newStr = ' ' * length
+        cls._s_cache[str(length)] = newStr
+        return newStr
 
     @classmethod
     def OfLength(cls, length):
-        if self._s_cache.TryGetValue(length, ):
-            cachedValue
-        return self._s_cache[length] = System.String(' ', length)
+        return cls._s_cache.get(str(length)) or cls._cache(length)

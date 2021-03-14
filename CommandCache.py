@@ -9,4 +9,20 @@ import sys
 
 
 class CommandCache:
-    pass
+    '''
+    This is not necessary since Python has better ways of doing this
+    (s+str(i))
+    This is kept only for type checking purposes.
+    '''
+    # s_cache = {}
+
+    @classmethod
+    def Get(cls, commandType, commandNumber):
+        if not isinstance(commandNumber, int):
+            raise ValueError("The commandNumber must be an int but"
+                             " is \"{}\".".format(commandNumber))
+        if len(commandType) != 1:
+            raise ValueError("The commandType must be a character but"
+                             " is \"{}\".".format(commandType))
+        # got = cls.s_cache.get((commandType+","str(commandNumber))
+        return commandType + str(commandNumber)
