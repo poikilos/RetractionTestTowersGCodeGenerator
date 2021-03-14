@@ -1,8 +1,13 @@
 ﻿#!/usr/bin/env python
-# Processed by pycodetool https://github.com/poikilos/pycodetool2021-03-13 21:59:55
+# Processed by pycodetool https://github.com/poikilos/pycodetool
+# 2021-03-13 21:59:55
 
 import sys
 
-class GCodeCommandPartType(object):
-    def __init__(self):
-        pass
+
+# enum GCodeCommandPartType
+class GCodeCommandPartType:
+    Space = 0
+    CharacterAndNumber = 1
+    Comment = 2
+    Text = 3

@@ -1,4 +1,6 @@
-﻿# Processed by pycodetool https://github.com/poikilos/pycodetool2021-03-14 10:52:20
+﻿#!/usr/bin/env python
+# Processed by pycodetool https://github.com/poikilos/pycodetool
+# 2021-03-14 10:52:20
 # from System import *
 # from System.Collections.Generic import *
 # from System.IO import *
@@ -12,9 +14,11 @@ class Program:
 
     class CurvePointType:
         def __init__(self):
+            pass
 
     class CurvePoint:
         def __init__(self):
+            pass
 
     @classmethod
     def GetTemplateReader(cls):
