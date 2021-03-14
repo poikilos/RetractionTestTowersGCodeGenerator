@@ -1,8 +1,10 @@
-﻿from System import *
-# Processed by pycodetool https://github.com/poikilos/pycodetool2021-03-13 21:56:47
+﻿#!/usr/bin/env python
+# Processed by pycodetool https://github.com/poikilos/pycodetool2021-03-13 21:54:12
+# from System import *
+# from System.Collections.Generic import *
+# from System.Text import *
+
 import sys
-#from System.Collections.Generic import *
-#from System.Text import *
 
 class CommandCache:
     pass
