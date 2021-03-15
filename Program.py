@@ -272,7 +272,7 @@ class Program:
 
                 if argName == "/output":
                     outputFileName = args[index + 1]
-                    index += 1
+                    index += 2
                     continue
 
                 elif argName == "/center":
