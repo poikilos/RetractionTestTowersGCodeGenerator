@@ -1,5 +1,10 @@
 RetractionTest.gcode
 
+Retraction Test Towers Template.gcode
+# ^ G-code isn't loaded without question anymore.
+#   Using G-code not tailored to the printer can be very bad! See
+#   <https://github.com/poikilos/RetractionTowerProcessor/commit/2998326be98aa07c9212eee56d6d099b8d04f9d1>
+
 *.blend1
 *.tmp
 style-check-output.txt
