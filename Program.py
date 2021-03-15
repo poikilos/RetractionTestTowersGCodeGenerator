@@ -289,27 +289,23 @@ class Program:
                 if argName == "/output":
                     outputFileName = args[index + 1]
                     index += 1
-
                     continue
+
                 elif argName == "/center":
                     deltaX = float(args[index + 1]) - extents.X.Middle
                     deltaY = float(args[index + 2]) - extents.Y.Middle
-
                     index += 3
-
                     continue
+
                 elif argName == "/startwith":
                     initialPoint = CurvePoint()
-
                     initialPoint.PointType = CurvePointType.SameValueUntil
                     initialPoint.Z = Program.get_FirstTowerZ()
                     initialPoint.Retraction = float(args[index + 1])
-
                     curvePoints.append(initialPoint)
-
                     index += 2
-
                     continue
+
                 elif ((argName == "/setat")
                         or (argName == "/interpolateto")):
                     if argName == "/setat":
@@ -333,7 +329,7 @@ class Program:
 
         if (deltaX != 0) or (deltaY != 0):
             print(
-                "Will translate test print to be centred at ({0:.1f}"
+                "Will translate test print to be centered at ({0:.1f}"
                 ", {1:.1f})".format(
                     extents.X.Middle + deltaX,
                     extents.Y.Middle + deltaY,
