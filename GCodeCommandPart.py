@@ -14,6 +14,7 @@ import sys
 from cc0code import (
     IsSpace,
     ToNumber,
+    NumberToStr,
 )
 
 class GCodeCommandPart:
@@ -28,6 +29,7 @@ class GCodeCommandPart:
     Text -- additional text such as for when Type is
             GCodeCommandPartType.Comment
     '''
+    F_PARAMS = "XY" #ZE"  # always convert to float
     def __init__(self, **kwargs):
         self.Type = kwargs.get("Type")
         self.Character = kwargs.get("Character")
@@ -45,7 +47,9 @@ class GCodeCommandPart:
         if self.Type == GCodeCommandPartType.Space:
             return SpaceString.OfLength(self.Number)
         elif self.Type == GCodeCommandPartType.CharacterAndNumber:
-            return self.Character + str(self.Number)
+            if self.Character in GCodeCommandPart.F_PARAMS:
+                return self.Character + str(float(self.Number))
+            return self.Character + NumberToStr(self.Number)
         elif self.Type == GCodeCommandPartType.Comment:
             return ';' + self.Text
         elif self.Type == GCodeCommandPartType.Text:

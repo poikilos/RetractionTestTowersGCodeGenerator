@@ -191,7 +191,7 @@ class Program:
             line = stream.readline()
             if not line:
                 break
-            line = line.rstrip()
+            line = line.rstrip("\n\r")
 
             if IsNullOrWhiteSpace(line):
                 continue
@@ -401,7 +401,7 @@ class Program:
                 line = reader.readline()
                 if not line:
                     break
-                line = line.rstrip()
+                line = line.rstrip("\n\r")
 
                 command = GCodeCommand(line)
 
@@ -440,7 +440,7 @@ class Program:
             line = reader.readline()
             if not line:
                 break
-            line = line.rstrip()
+            line = line.rstrip("\n\r")
 
             command = GCodeCommand(line)
 

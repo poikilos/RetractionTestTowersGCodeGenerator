@@ -21,3 +21,13 @@ def IsSpace(*args):
         return str.isspace(args[0][args[1]])
     raise ValueError("IsSpace only takes (charStr)"
                      " or (str, index)")
+
+def NumberToStr(n):
+    '''
+    Mimic c# decimal1.ToString() behavior common to G-code (lose the
+    decimal places if not present) since in Python, str(float(1.0))
+    is "1.0".
+    '''
+    if isinstance(n, float) and (float(int(n)) == n):
+        return str(int(n))
+    return str(n)

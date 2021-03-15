@@ -17,7 +17,6 @@ from CommandCache import CommandCache
 
 
 class GCodeCommand:
-    # F_PARAMS = "XYZE"  # always convert to float
     def __init__(self, line):
         self._line = line  # for debugging only
         self.Command = None
@@ -35,7 +34,7 @@ class GCodeCommand:
                 # break
                 else:
                     if isinstance(part.Number, int):
-                        # if part.Character in GCodeCommand.F_PARAMS:
+                        # if part.Character in GCodeCommandPart.F_PARAMS
                         part.Number = float(part.Number)
 
         if firstPart is not None:
