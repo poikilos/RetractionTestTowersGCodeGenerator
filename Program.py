@@ -7,7 +7,10 @@
 # from System.Linq import *
 import sys
 import os
-from GCodeCommandPart import IsSpace
+from GCodeCommandPart import (
+    IsSpace,
+)
+from GCodeCommand import GCodeCommand
 
 digits = "0123456789"
 
@@ -59,22 +62,22 @@ class CurvePoint:
         return l.Z - r.Z
 
     def __lt__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) < 0
+        return CurvePoint.compare(self, other) < 0
 
     def __gt__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) > 0
+        return CurvePoint.compare(self, other) > 0
 
     def __eq__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) == 0
+        return CurvePoint.compare(self, other) == 0
 
     def __le__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) <= 0
+        return CurvePoint.compare(self, other) <= 0
 
     def __ge__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) >= 0
+        return CurvePoint.compare(self, other) >= 0
 
     def __ne__(self, other):
-        return CurvePoint.compare(self.Z, other.Z) != 0
+        return CurvePoint.compare(self, other) != 0
 
 
 class GCodeWriter:
@@ -300,7 +303,7 @@ class Program:
             if z < FirstTowerZ:
                 lastExtraRow = True
                 z = FirstTowerZ
-            sys.stdout.write(z.ToString("#0.0").rjust(4))
+            sys.stdout.write("{:.1f}".format(z).rjust(4))
             sys.stdout.write(' ')
             curvePointsPassed = \
                 sum(1 for point in curvePoints if point.Z >= z)
@@ -310,7 +313,7 @@ class Program:
                 sys.stdout.write("+ ")
                 lastCurvePointsPassed = curvePointsPassed
             retraction = Program.GetRetractionForZ(z, curvePoints)
-            sys.stdout.write(retraction.ToString("#0.0000 ").rjust(8))
+            sys.stdout.write("{:.4f} ".format(retraction).rjust(8))
             barWidth = int(round(retraction * 5))
             for i in range(barWidth):
                 sys.stdout.write('*')
@@ -361,8 +364,8 @@ class Program:
                         e = command.GetParameter('E')
 
                         if e < lastE:
-                            print("=> Retract by {lastE - e} at Z {z}"
-                                  "".format(lastE=lastE,e=e,z=z))
+                            print("=> Retract by {0} at Z {z}"
+                                  "".format(lastE-e, z=z))
                         else:
                             lastE = e
 
@@ -376,17 +379,11 @@ class Program:
                              " is \"{}\".".format(curvePoints))
 
         curvePoints = sorted(curvePoints)
-
         z = sys.float_info.min
-
         uniqueZValues = set()
-
         lastE = sys.float_info.min
-
         lastSerialMessage = ""
-
         gcodeWriter = GCodeWriter(writer)
-
         numberOfRetractions = 0
 
         # CHECK NEXT LINE for type declarations !!!

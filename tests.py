@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from GCodeCommandPart import (
     GCodeCommandPart,
     IsSpace,
@@ -11,6 +12,7 @@ from GCodeCommand import (
 from Program import (
     Extent,
     CurvePoint,
+    CurvePointType,
 )
 
 def toPythonLiteral(v):
@@ -132,7 +134,11 @@ assertPartsAllEqual(good_parts, got_parts)
 
 line = "G00 X25 Y20"
 command = GCodeCommand(line)
-assertEqual(command.Command, "G00")
+assertEqual(command.Command, "G0")
+# ^ "[you don't need leading zeroes](https://www.cnctrainingcentre.com/
+# beginners/cnc-programming-basics-leading-ttrailing-zeros/)."
+# <https://www.cnctrainingcentre.com/fanuc-turn/g01-g00-basic-cnc-
+# programming/>
 
 ex = Extent()
 ex.From = 1.0
@@ -174,10 +180,17 @@ assertEqual(curvePoints[2].Z, 3.0)
 lastE = 3
 e = 1
 z = .32
+'''
 s = "=> Retract by {lastE - e} at Z {z}".format(
     lastE=lastE,
     z=z,
     e=e,
+)
+'''
+# ^ C#-like operations don't work
+s = "=> Retract by {0} at Z {z}".format(
+    lastE - e,
+    z=z,
 )
 assertEqual(s, "=> Retract by "+str(lastE-e)+" at Z "+str(z))
 
@@ -194,6 +207,6 @@ assertEqual(curvePointsPassed, 3)
 z = 3.0
 curvePointsPassed = \
     sum(1 for point in curvePoints if point.Z >= z)
-assertEqual(curvePointsPassed, 3)
+assertEqual(curvePointsPassed, 1)
 
 print("All tests passed.")

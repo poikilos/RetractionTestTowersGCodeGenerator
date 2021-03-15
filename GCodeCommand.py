@@ -28,7 +28,7 @@ class GCodeCommand:
 
         if firstPart is not None:
             self.CommandType = firstPart.Character
-            self.CommandNumber = firstPart.Number
+            self.CommandNumber = int(firstPart.Number)
             try:
                 self.Command = CommandCache.Get(self.CommandType,
                                                 self.CommandNumber)
