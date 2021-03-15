@@ -261,23 +261,7 @@ class Program:
 
         outputFileName = "RetractionTest.gcode"
 
-        if len(args) == 0:
-            curvePoints.append(
-                CurvePoint(
-                    PointType = CurvePointType.SameValueUntil,
-                    Z = Program.get_FirstTowerZ(),
-                    Retraction = 2.0,
-                )
-            )
-
-            curvePoints.append(
-                CurvePoint(
-                    PointType = CurvePointType.InterpolateUpTo,
-                    Z = extents.Z.To,
-                    Retraction = 3.0,
-                )
-            )
-        else:
+        if True:
             index = 0
 
             # CHECK NEXT LINE for type declarations !!!
@@ -324,6 +308,30 @@ class Program:
                     return
 
                 raise Exception("Invalid command-line format")
+        if len(curvePoints) == 0:
+            curvePoints.append(
+                CurvePoint(
+                    PointType = CurvePointType.SameValueUntil,
+                    Z = Program.get_FirstTowerZ(),
+                    Retraction = 2.0,
+                )
+            )
+
+            curvePoints.append(
+                CurvePoint(
+                    PointType = CurvePointType.InterpolateUpTo,
+                    Z = extents.Z.To,
+                    Retraction = 3.0,
+                )
+            )
+        elif len(curvePoints) == 1:
+            curvePoints.append(
+                CurvePoint(
+                    PointType = CurvePointType.InterpolateUpTo,
+                    Z = extents.Z.To,
+                    Retraction = curvePoints[0].Retraction + 1,
+                )
+            )
 
         print("")
 
