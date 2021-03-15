@@ -1,9 +1,9 @@
 def decimal_Parse(s):
     return float(s)
 
-def IsSpace(*args):
+def IsWhiteSpace(*args):
     '''
-    Mimic char.IsSpace.
+    Mimic char.IsWhiteSpace.
 
     Sequential arguments:
     1st (args[0]) -- String to check as a whole or as a character
@@ -12,7 +12,7 @@ def IsSpace(*args):
                      be checked.
     '''
     if len(args) == 1:
-        raise ValueError("IsSpace only takes (c)"
+        raise ValueError("IsWhiteSpace only takes (c)"
                          " or (c, index)")
     if len(args[0]) != 1:
         raise ValueError("The 1st param must be a character but is"
@@ -21,7 +21,7 @@ def IsSpace(*args):
         return str.isspace(args[0])
     elif len(args) == 2:
         return str.isspace(args[0][args[1]])
-    raise ValueError("IsSpace only takes (charStr)"
+    raise ValueError("IsWhiteSpace only takes (charStr)"
                      " or (str, index)")
 
 

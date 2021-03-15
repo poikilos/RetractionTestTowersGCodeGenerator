@@ -12,7 +12,7 @@ from SpaceString import SpaceString
 import sys
 
 from cc0code import (
-    IsSpace,
+    IsWhiteSpace,
     decimal_Parse,
     NumberToStr,
     IsNullOrWhiteSpace,
@@ -106,10 +106,10 @@ class GCodeCommandPart:
                     CommentMark=commentMark,
                 )
                 return
-            if IsSpace(line[index]):
+            if IsWhiteSpace(line[index]):
                 count = 1
                 index += 1
-                while (index < len(line)) and IsSpace(line, index):
+                while (index < len(line)) and IsWhiteSpace(line, index):
                     count += 1
                     index += 1
                 yield GCodeCommandPart(
@@ -124,7 +124,7 @@ class GCodeCommandPart:
                 index += 1
                 numberStart = index
                 while ((index < len(line))
-                       and not IsSpace(line, index)):
+                       and not IsWhiteSpace(line, index)):
                     index += 1
                 try:
                     part.Number = decimal_Parse(line[numberStart:index])
@@ -144,7 +144,7 @@ class GCodeCommandPart:
                     count = 1
                     index += 1
                     while ((index < len(line))
-                            and IsSpace(line, index)):
+                            and IsWhiteSpace(line, index)):
                         count += 1
                         index += 1
 

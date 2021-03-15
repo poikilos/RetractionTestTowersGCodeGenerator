@@ -8,7 +8,7 @@
 import sys
 import os
 from cc0code import (
-    IsSpace,
+    IsWhiteSpace,
     decimal_Parse,
     IsNullOrWhiteSpace,
     IsDigit,
@@ -113,7 +113,7 @@ class GCodeWriter:
         i = -1
         while i + 1 < len(line):
             i += 1
-            if IsSpace(line, i):
+            if IsWhiteSpace(line, i):
                 continue
             if (line[i] == ';') or (line[i:i+2] == '//'):
                 break
@@ -127,7 +127,7 @@ class GCodeWriter:
     @staticmethod
     def IsMovementCommand(command):
         for i in range(len(command)):
-            if IsSpace(command, i):
+            if IsWhiteSpace(command, i):
                 continue
             if (command[i] == ';') or (command[i:i+2] == '//'):
                 break
@@ -138,7 +138,7 @@ class GCodeWriter:
                 if (command[i] != '0') and (command[i] != '1'):
                     return False
                 i += 1
-                return (i >= len(command)) or IsSpace(command[i])
+                return (i >= len(command)) or IsWhiteSpace(command[i])
         return False
 
 
@@ -429,7 +429,9 @@ class Program:
         numberOfRetractions = 0
 
         # CHECK NEXT LINE for type declarations !!!
+        line_n = 0
         while True:
+            line_n += 1
             line = reader.readline()
             if not line:
                 break

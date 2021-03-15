@@ -2,7 +2,7 @@
 
 from GCodeCommandPart import (
     GCodeCommandPart,
-    IsSpace,
+    IsWhiteSpace,
 )
 
 from GCodeCommand import (
@@ -115,13 +115,13 @@ def assertPartsAllEqual(list1, list2, tbs=None):
         assertPartEqual(list1[i], list2[i], tbs=tbs)
 
 
-assert(IsSpace(" "))
-assert(not IsSpace(" a"))
-assert(not IsSpace("a "))
-assert(not IsSpace(" a "))
-assert(IsSpace("a ", 1))
-assert(IsSpace(" a", 0))
-assert(IsSpace(" a ", 2))
+assert(IsWhiteSpace(" "))
+assert(not IsWhiteSpace(" a"))
+assert(not IsWhiteSpace("a "))
+assert(not IsWhiteSpace(" a "))
+assert(IsWhiteSpace("a ", 1))
+assert(IsWhiteSpace(" a", 0))
+assert(IsWhiteSpace(" a ", 2))
 
 good_parts = [GCodeCommandPart(Character="M", Number=70)]
 got_parts = []
