@@ -186,7 +186,6 @@ class Program:
         currentZ = sys.float_info.min
         zTBS = None
 
-        # CHECK NEXT LINE for type declarations !!!
         while True:
             line = stream.readline()
             if not line:
@@ -264,7 +263,6 @@ class Program:
         if True:
             index = 0
 
-            # CHECK NEXT LINE for type declarations !!!
             while index < len(args):
                 curvePoint = CurvePoint()
 
@@ -397,7 +395,6 @@ class Program:
             z = sys.float_info.min
             lastE = sys.float_info.min
 
-            # CHECK NEXT LINE for type declarations !!!
             while True:
                 line = reader.readline()
                 if not line:
@@ -436,7 +433,6 @@ class Program:
         gcodeWriter = GCodeWriter(writer)
         numberOfRetractions = 0
 
-        # CHECK NEXT LINE for type declarations !!!
         line_n = 0
         while True:
             line_n += 1
@@ -519,7 +515,6 @@ class Program:
                              " is \"{}\".".format(curvePoints))
         previousPoint = curvePoints[0]
 
-        # CHECK NEXT LINE for type declarations !!!
         for point in curvePoints:
             if point.Z >= z:
                 if point.PointType == CurvePointType.SameValueUntil:
