@@ -150,6 +150,7 @@ class Program:
     MODEL_PATH = os.path.join(DATA_DIR, "Model",
                               "RetractionTestCylinders.stl")
     TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
+    _extents = None
 
     @staticmethod
     def get_FirstTowerZ():
@@ -160,16 +161,23 @@ class Program:
         return Program._GraphRowHeight
 
     @staticmethod
+    def getTemplateUsage():
+        msg = (
+             "You must specify a template path or\n"
+             " generate the G-code file \"{}\""
+             " from \"{}\" using your slicer software."
+             "".format(Program.TEMPLATE_PATH,
+                       Program.MODEL_PATH)
+        )
+        return msg
+
+    @staticmethod
     def GetTemplateReader():
         # formerly (nameof(RetractionTestTowersGCodeGenerator)
         # + ".Retraction Test Towers Template.gcode"))
         if not os.path.isfile(Program.TEMPLATE_PATH):
-            raise ValueError("You must specify a template path or\n"
-                             " generate the G-code file \"{}\""
-                             " from \"{}\" using your slicer software."
-                             "".format(Program.TEMPLATE_PATH,
-                                       Program.MODEL_PATH))
-            return None
+            raise ValueError(Program.getTemplateUsage())
+            # return None
         return open(Program.TEMPLATE_PATH)
 
     @staticmethod
@@ -235,23 +243,35 @@ class Program:
         return result
 
     @classmethod
-    def Main(cls, args):
-        reader = Program.GetTemplateReader()
+    def CalculateExtents(cls):
+        if not os.path.isfile(cls.TEMPLATE_PATH):
+            return False
+        ok = False
+        reader = cls.GetTemplateReader()
         try:
-            extents = Program.MeasureGCode(reader)
+            cls._extents = cls.MeasureGCode(reader)
+            ok = True
         finally:
             reader.close()
 
-        print("Template extents:")
+        if ok:
+            print("Template extents:")
 
-        print("    From     Centre   To")
-        print("X   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
-              "".format(extents.X.From, extents.X.Middle, extents.X.To))
-        print("Y   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
-              "".format(extents.Y.From, extents.Y.Middle, extents.Y.To))
-        print("Z   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
-              "".format(extents.Z.From, extents.Z.Middle, extents.Z.To))
+            print("    From     Centre   To")
+            print("X   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+                  "".format(cls._extents.X.From, cls._extents.X.Middle,
+                            cls._extents.X.To))
+            print("Y   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+                  "".format(cls._extents.Y.From, cls._extents.Y.Middle,
+                            cls._extents.Y.To))
+            print("Z   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+                  "".format(cls._extents.Z.From, cls._extents.Z.Middle,
+                            cls._extents.Z.To))
+        return ok
 
+    @classmethod
+    def Main(cls, args):
+        cls.CalculateExtents()
 
         curvePoints = []
 
@@ -274,20 +294,21 @@ class Program:
                     continue
 
                 elif argName == "/center":
-                    deltaX = float(args[index + 1]) - extents.X.Middle
-                    deltaY = float(args[index + 2]) - extents.Y.Middle
+                    deltaX = float(args[index + 1]) - cls._extents.X.Middle
+                    deltaY = float(args[index + 2]) - cls._extents.Y.Middle
                     index += 3
                     continue
 
                 elif argName == "/template":
-                    Program.TEMPLATE_PATH = args[index + 1]
+                    cls.TEMPLATE_PATH = args[index + 1]
+                    cls.CalculateExtents()
                     index += 2
                     continue
 
                 elif argName == "/startwith":
                     initialPoint = CurvePoint()
                     initialPoint.PointType = CurvePointType.SameValueUntil
-                    initialPoint.Z = Program.get_FirstTowerZ()
+                    initialPoint.Z = cls.get_FirstTowerZ()
                     initialPoint.Retraction = float(args[index + 1])
                     curvePoints.append(initialPoint)
                     index += 2
@@ -307,15 +328,17 @@ class Program:
                     continue
 
                 elif argName == "/checkfile":
-                    Program.AnalyzeFile(args[index + 1])
+                    cls.AnalyzeFile(args[index + 1])
                     return
 
                 raise Exception("Invalid command-line format")
+        if not os.path.isfile(cls.TEMPLATE_PATH):
+            raise ValueError(Program.getTemplateUsage())
         if len(curvePoints) == 0:
             curvePoints.append(
                 CurvePoint(
                     PointType = CurvePointType.SameValueUntil,
-                    Z = Program.get_FirstTowerZ(),
+                    Z = cls.get_FirstTowerZ(),
                     Retraction = 2.0,
                 )
             )
@@ -323,7 +346,7 @@ class Program:
             curvePoints.append(
                 CurvePoint(
                     PointType = CurvePointType.InterpolateUpTo,
-                    Z = extents.Z.To,
+                    Z = cls._extents.Z.To,
                     Retraction = 3.0,
                 )
             )
@@ -334,8 +357,8 @@ class Program:
             print(
                 "Will translate test print to be centered at ({0:.1f}"
                 ", {1:.1f})".format(
-                    extents.X.Middle + deltaX,
-                    extents.Y.Middle + deltaY,
+                    cls._extents.X.Middle + deltaX,
+                    cls._extents.Y.Middle + deltaY,
                 )
             )
             print("")
@@ -345,12 +368,12 @@ class Program:
         lastCurvePointsPassed = 0
 
         z = 17.0
-        span = Program.get_FirstTowerZ() - Program.get_GraphRowHeight()
+        span = cls.get_FirstTowerZ() - cls.get_GraphRowHeight()
         while z >= span:
             lastExtraRow = False
-            if z < Program.get_FirstTowerZ():
+            if z < cls.get_FirstTowerZ():
                 lastExtraRow = True
-                z = Program.get_FirstTowerZ()
+                z = cls.get_FirstTowerZ()
             sys.stdout.write("{:.1f}".format(z).rjust(4))
             sys.stdout.write(' ')
             curvePointsPassed = \
@@ -360,7 +383,7 @@ class Program:
             else:
                 sys.stdout.write("+ ")
                 lastCurvePointsPassed = curvePointsPassed
-            retraction = Program.GetRetractionForZ(z, curvePoints)
+            retraction = cls.GetRetractionForZ(z, curvePoints)
             sys.stdout.write("{:.4f} ".format(retraction).rjust(8))
             barWidth = int(round(retraction * 5))
             for i in range(barWidth):
@@ -368,7 +391,7 @@ class Program:
             print("")
             if lastExtraRow:
                 break
-            z -= Program.get_GraphRowHeight()
+            z -= cls.get_GraphRowHeight()
 
         print("")
         print("Will write output to: {0}".format(outputFileName))
@@ -377,10 +400,10 @@ class Program:
             print("")
             print("Generating G code...")
 
-            Program.TranslateGCode(
-                Program.GetTemplateReader(),
+            cls.TranslateGCode(
+                cls.GetTemplateReader(),
                 writer,
-                Program.get_FirstTowerZ(),
+                cls.get_FirstTowerZ(),
                 deltaX,
                 deltaY,
                 curvePoints,
