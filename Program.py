@@ -14,6 +14,7 @@ from cc0code import (
     IsDigit,
 )
 from GCodeCommand import GCodeCommand
+from GCodeCommandPart import GCodeCommandPart
 
 class Extent:
     def __init__(self):
@@ -115,7 +116,7 @@ class GCodeWriter:
             i += 1
             if IsWhiteSpace(line, i):
                 continue
-            if (line[i] == ';') or (line[i:i+2] == '//'):
+            if GCodeCommandPart.isCommentAt(line, i):
                 break
             if (line[i] == 'G') or (line[i] == 'M'):
                 i += 1
@@ -126,10 +127,12 @@ class GCodeWriter:
 
     @staticmethod
     def IsMovementCommand(command):
-        for i in range(len(command)):
+        i = -1
+        while i + 1 < len(command):
+            i += 1
             if IsWhiteSpace(command, i):
                 continue
-            if (command[i] == ';') or (command[i:i+2] == '//'):
+            if GCodeCommandPart.isCommentAt(command, i):
                 break
             if command[i] == 'G':
                 i += 1

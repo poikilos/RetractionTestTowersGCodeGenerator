@@ -31,6 +31,7 @@ class GCodeCommandPart:
     Text -- additional text such as for when Type is
             GCodeCommandPartType.Comment
     '''
+    COMMENT_MARKS = [';', '//']
     F_PARAMS = "XY" #ZE"  # always convert to float
     def __init__(self, **kwargs):
         self.Type = kwargs.get("Type")
@@ -89,16 +90,31 @@ class GCodeCommandPart:
             raise Exception("Internal error")
 
     @staticmethod
+    def commentMarkAt(line, i):
+        '''
+        Get the comment mark at i in line, or return None if there is
+        not a comment mark there.
+        '''
+        for cm in GCodeCommandPart.COMMENT_MARKS:
+            if line[i:i+len(cm)] == cm:
+                return cm
+        return None
+
+    def isCommentAt(line, i):
+        '''
+        Return True if there is a comment mark at i in line.
+        Otherwise, return False.
+        '''
+        return GCodeCommandPart.commentMarkAt(line, i) is not None
+
+    @staticmethod
     def ParseStringToParts(line):
         results = []
         isFirstPart = True
         index = 0
+
         while index < len(line):
-            commentMark = None
-            if (line[index] == ';'):
-                commentMark = ';'
-            elif (line[index:index+2] == '//'):
-                commentMark = '//'
+            commentMark = GCodeCommandPart.commentMarkAt(line, index)
             if commentMark is not None:
                 yield GCodeCommandPart(
                     Type=GCodeCommandPartType.Comment,
@@ -124,7 +140,8 @@ class GCodeCommandPart:
                 index += 1
                 numberStart = index
                 while ((index < len(line))
-                       and not IsWhiteSpace(line, index)):
+                       and not IsWhiteSpace(line, index)
+                       and not GCodeCommandPart.isCommentAt(line, index)):
                     index += 1
                 try:
                     part.Number = decimal_Parse(line[numberStart:index])

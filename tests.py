@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from GCodeCommandPart import (
-    GCodeCommandPart,
-    IsWhiteSpace,
+from GCodeCommandPart import GCodeCommandPart
+
+from cc0code import (
+    IsWhiteSpace
 )
 
 from GCodeCommand import (
@@ -116,9 +117,9 @@ def assertPartsAllEqual(list1, list2, tbs=None):
 
 
 assert(IsWhiteSpace(" "))
-assert(not IsWhiteSpace(" a"))
-assert(not IsWhiteSpace("a "))
-assert(not IsWhiteSpace(" a "))
+assert(not IsWhiteSpace(" a", 1))
+assert(not IsWhiteSpace("a ", 0))
+assert(not IsWhiteSpace(" a ", 1))
 assert(IsWhiteSpace("a ", 1))
 assert(IsWhiteSpace(" a", 0))
 assert(IsWhiteSpace(" a ", 2))
@@ -143,7 +144,15 @@ assertEqual(command.Command, "G0")
 # <https://www.cnctrainingcentre.com/fanuc-turn/g01-g00-basic-cnc-
 # programming/>
 assertEqual(command.GetParameter('G'), 0)
-assert(isinstance(command.GetParameter('G'), int))
+floatGWarningMsg = (
+    "The G command number is a float (The file output should be ok as"
+    " long as NumberToStr is used for writing floats without decimals"
+    " if not present)"
+)
+if isinstance(command.GetParameter('G'), float):
+    print("WARNING: {}.".format(floatGWarningMsg))
+else:
+    assert(isinstance(command.GetParameter('G'), int))
 assert(isinstance(command.GetParameter('X'), float))
 # ^ Even if there is no decimal, it should be converted to float.
 assertEqual(command.GetParameter('X'), 25)
@@ -152,7 +161,10 @@ assertEqual(command.GetParameter('Y'), 20)
 line="G1 X206.867 Y199.367 E294.62339"
 command = GCodeCommand(line)
 assertEqual(command.Command, "G1")
-assert(isinstance(command.GetParameter('G'), int))
+if isinstance(command.GetParameter('G'), float):
+    print("WARNING: {}.".format(floatGWarningMsg))
+else:
+    assert(isinstance(command.GetParameter('G'), int))
 assert(isinstance(command.GetParameter('X'), float))
 assertEqual(command.GetParameter('X'), 206.867)
 assertEqual(command.GetParameter('E'), 294.62339)

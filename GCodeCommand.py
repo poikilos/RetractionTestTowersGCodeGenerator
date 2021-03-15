@@ -8,10 +8,7 @@
 
 import sys
 
-from GCodeCommandPart import (
-    GCodeCommandPart,
-)
-
+from GCodeCommandPart import GCodeCommandPart
 from GCodeCommandPartType import GCodeCommandPartType
 from CommandCache import CommandCache
 
@@ -49,7 +46,7 @@ class GCodeCommand:
                 raise e
         else:
             pass
-            # if (line[0:1] != ';') and (line[0:2] != '//'):
+            # if not GCodeCommandPart.isCommentAt(line, i):
             #     print("WARNING: There is no firstPart in `{}`"
             #           "".format(line))
 
