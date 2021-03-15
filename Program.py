@@ -9,19 +9,11 @@ import sys
 import os
 from cc0code import (
     IsSpace,
-    ToNumber,
+    decimal_Parse,
+    IsNullOrWhiteSpace,
+    IsDigit,
 )
 from GCodeCommand import GCodeCommand
-
-digits = "0123456789"
-
-def IsNullOrWhiteSpace(s):
-    if s is None:
-        return True
-    if len(s) == 0:
-        return True
-    return str.isspace(s)
-
 
 class Extent:
     def __init__(self):
@@ -123,13 +115,13 @@ class GCodeWriter:
             i += 1
             if IsSpace(line, i):
                 continue
-            if line[i] == ';':
+            if (line[i] == ';') or (line[i:i+2] == '//'):
                 break
             if (line[i] == 'G') or (line[i] == 'M'):
                 i += 1
                 if i >= len(line):
                     return False
-                return line[i] in digits
+                return IsDigit(line[i])
         return False
 
     @staticmethod
@@ -137,7 +129,7 @@ class GCodeWriter:
         for i in range(len(command)):
             if IsSpace(command, i):
                 continue
-            if command[i] == ';':
+            if (command[i] == ';') or (command[i:i+2] == '//'):
                 break
             if command[i] == 'G':
                 i += 1
@@ -153,8 +145,9 @@ class GCodeWriter:
 class Program:
     _FirstTowerZ = 2.1
     _GraphRowHeight = 0.5
-    TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
+    _DEFAULT_TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+    TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
 
     @staticmethod
     def get_FirstTowerZ():
@@ -168,8 +161,7 @@ class Program:
     def GetTemplateReader():
         # formerly (nameof(RetractionTestTowersGCodeGenerator)
         # + ".Retraction Test Towers Template.gcode"))
-        template_path = os.path.join(Program.DATA_DIR,
-                                     Program.TEMPLATE_NAME)
+        template_path = os.path.join(Program.TEMPLATE_PATH)
         return open(template_path)
 
     @staticmethod
@@ -279,6 +271,11 @@ class Program:
                     deltaX = float(args[index + 1]) - extents.X.Middle
                     deltaY = float(args[index + 2]) - extents.Y.Middle
                     index += 3
+                    continue
+
+                elif argName == "/template":
+                    Program.TEMPLATE_PATH = args[index + 1]
+                    index += 2
                     continue
 
                 elif argName == "/startwith":

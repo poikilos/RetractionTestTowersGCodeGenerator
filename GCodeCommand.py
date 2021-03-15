@@ -49,7 +49,7 @@ class GCodeCommand:
                 raise e
         else:
             pass
-            # if line[0:1] != ";":
+            # if (line[0:1] != ';') and (line[0:2] != '//'):
             #     print("WARNING: There is no firstPart in `{}`"
             #           "".format(line))
 

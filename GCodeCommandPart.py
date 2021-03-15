@@ -13,9 +13,11 @@ import sys
 
 from cc0code import (
     IsSpace,
-    ToNumber,
+    decimal_Parse,
     NumberToStr,
+    IsNullOrWhiteSpace,
 )
+
 
 class GCodeCommandPart:
     '''
@@ -35,6 +37,7 @@ class GCodeCommandPart:
         self.Character = kwargs.get("Character")
         self.Number = kwargs.get("Number")
         self.Text = kwargs.get("Text")
+        self.CommentMark = kwargs.get("CommentMark")
 
     def __str__(self):
         return self.ToString()
@@ -51,7 +54,10 @@ class GCodeCommandPart:
                 return self.Character + str(float(self.Number))
             return self.Character + NumberToStr(self.Number)
         elif self.Type == GCodeCommandPartType.Comment:
-            return ';' + self.Text
+            commentMark = self.CommentMark
+            if IsNullOrWhiteSpace(self.CommentMark):
+                commentMark = ';'
+            return commentMark + self.Text
         elif self.Type == GCodeCommandPartType.Text:
             return self.Text
         else:
@@ -74,7 +80,10 @@ class GCodeCommandPart:
             #   .5g counts 5 INCLUDING before the decimal but we always
             #   want all 5 if present)
         elif self.Type == GCodeCommandPartType.Comment:
-            writer.write(';')
+            if not IsNullOrWhiteSpace(self.CommentMark):
+                writer.write(self.CommentMark)
+            else:
+                writer.write(';')
             writer.write(self.Text)
         else:
             raise Exception("Internal error")
@@ -85,10 +94,16 @@ class GCodeCommandPart:
         isFirstPart = True
         index = 0
         while index < len(line):
-            if line[index] == ';':
+            commentMark = None
+            if (line[index] == ';'):
+                commentMark = ';'
+            elif (line[index:index+2] == '//'):
+                commentMark = '//'
+            if commentMark is not None:
                 yield GCodeCommandPart(
                     Type=GCodeCommandPartType.Comment,
-                    Text=line[index + 1:],
+                    Text=line[index + len(commentMark):],
+                    CommentMark=commentMark,
                 )
                 return
             if IsSpace(line[index]):
@@ -111,7 +126,12 @@ class GCodeCommandPart:
                 while ((index < len(line))
                        and not IsSpace(line, index)):
                     index += 1
-                part.Number = ToNumber(line[numberStart:index])
+                try:
+                    part.Number = decimal_Parse(line[numberStart:index])
+                except Exception as ex:
+                    print("line: `{}`".format(line))
+                    raise ex
+
 
                 yield part
                 wasFirstPart = isFirstPart
