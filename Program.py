@@ -324,14 +324,6 @@ class Program:
                     Retraction = 3.0,
                 )
             )
-        elif len(curvePoints) == 1:
-            curvePoints.append(
-                CurvePoint(
-                    PointType = CurvePointType.InterpolateUpTo,
-                    Z = extents.Z.To,
-                    Retraction = curvePoints[0].Retraction + 1,
-                )
-            )
 
         print("")
 
