@@ -1,0 +1,150 @@
+{"global_quality": "[general]
+version = 4
+name = Preferred
+definition = custom
+
+[metadata]
+quality_type = normal
+type = quality_changes
+setting_version = 10
+
+[values]
+adhesion_type = skirt
+jerk_enabled = False
+layer_height_0 = 0.3
+material_bed_temperature = 80
+remove_empty_first_layers = False
+
+", "extruder_quality": ["[general]
+version = 4
+name = Preferred
+definition = custom
+
+[metadata]
+quality_type = normal
+position = 0
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+alternate_extra_perimeter = True
+infill_pattern = gyroid
+ironing_enabled = True
+material_print_temperature = 207
+optimize_wall_printing_order = True
+retraction_amount = 3
+retraction_hop = 0.4
+retraction_hop_enabled = False
+retraction_speed = 40
+skin_angles = [0, 90 ]
+skirt_brim_speed = 30
+skirt_line_count = 5
+speed_layer_0 = 30
+speed_print = 30
+speed_topbottom = 30
+speed_travel = 50
+speed_wall = 30.0
+speed_wall_x = 30.0
+top_bottom_pattern_0 = concentric
+wall_thickness = 1.2
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 1
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 2
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 3
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 4
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 5
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 6
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+", "[general]
+version = 4
+name = Preferred
+definition = fdmprinter
+
+[metadata]
+quality_type = normal
+position = 7
+type = quality_changes
+intent_category = default
+setting_version = 10
+
+[values]
+
+"]}
