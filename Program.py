@@ -147,6 +147,8 @@ class Program:
     _GraphRowHeight = 0.5
     _DEFAULT_TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODEL_PATH = os.path.join(DATA_DIR, "Model",
+                              "Retraction Test Towers.stl")
     TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
 
     @staticmethod
@@ -161,8 +163,14 @@ class Program:
     def GetTemplateReader():
         # formerly (nameof(RetractionTestTowersGCodeGenerator)
         # + ".Retraction Test Towers Template.gcode"))
-        template_path = os.path.join(Program.TEMPLATE_PATH)
-        return open(template_path)
+        if not os.path.isfile(Program.TEMPLATE_PATH):
+            raise ValueError("You must specify a template path or\n"
+                             " generate the G-code file \"{}\""
+                             " from \"{}\" using your slicer software."
+                             "".format(Program.TEMPLATE_PATH,
+                                       Program.MODEL_PATH))
+            return None
+        return open(Program.TEMPLATE_PATH)
 
     @staticmethod
     def MeasureGCode(stream):
