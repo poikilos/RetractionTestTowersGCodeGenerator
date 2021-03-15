@@ -17,14 +17,26 @@ from CommandCache import CommandCache
 
 
 class GCodeCommand:
-
+    # F_PARAMS = "XYZE"  # always convert to float
     def __init__(self, line):
-        self._parts = GCodeCommandPart.ParseStringToParts(line)
+        self._line = line  # for debugging only
+        self.Command = None
+        self.CommandType = None
+        self.CommandNumber = None
+        self._parts = list(GCodeCommandPart.ParseStringToParts(line))
+        # print("line: `{}`".format(line))
+        # print("  parts: {}".format(self._parts))
         firstPart = None
+
         for part in self._parts:
             if part.Type == GCodeCommandPartType.CharacterAndNumber:
-                firstPart = part
-                break
+                if firstPart is None:
+                    firstPart = part
+                # break
+                else:
+                    if isinstance(part.Number, int):
+                        # if part.Character in GCodeCommand.F_PARAMS:
+                        part.Number = float(part.Number)
 
         if firstPart is not None:
             self.CommandType = firstPart.Character
@@ -34,12 +46,18 @@ class GCodeCommand:
                                                 self.CommandNumber)
             except Exception as e:
                 print("line: `{}`".format(line))
+                print("  parts: {}".format(self._parts))
                 raise e
+        else:
+            pass
+            # if line[0:1] != ";":
+            #     print("WARNING: There is no firstPart in `{}`"
+            #           "".format(line))
 
     def ToString(self):
         result = ""
         for part in self._parts:
-            result += part
+            result += str(part)
         return result
 
     def WriteTo(self, writer):
@@ -47,7 +65,18 @@ class GCodeCommand:
             writer.write(part)
 
     def HasParameter(self, v):
-        return self.GetPartByCharacter(v) is not None
+        return self.GetPartByCharacter(v) is not None\
+
+    def GetParameter(self, param):
+        part = self.GetPartByCharacter(param)
+        if part is None:
+            print("line: `{}`".format(self._line))
+            print("  parts: {}".format(self._parts))
+            raise Exception("Command does not have a parameter '{}'"
+                            "".format(param))
+
+        return part.Number
+
 
     def SetParameter(self, param, value):
         part = self.GetPartByCharacter(param)

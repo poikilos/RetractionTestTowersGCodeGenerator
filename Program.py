@@ -7,8 +7,9 @@
 # from System.Linq import *
 import sys
 import os
-from GCodeCommandPart import (
+from cc0code import (
     IsSpace,
+    ToNumber,
 )
 from GCodeCommand import GCodeCommand
 
@@ -31,10 +32,26 @@ class Extent:
     def Middle(self):
         return self.From * 0.5 + self.To * 0.5
 
-    def Extend(self, value):
+    def Extend(self, value, tbs=None):
+        '''
+        Keyword arguments:
+        tbs -- a string to display on error (put the line of G-code or
+               something else useful in here as some form of traceback
+               string).
+        '''
+        if isinstance(value, int):
+            msg = "."
+            if tbs is not None:
+                msg = " while \"{}\".".format(tbs)
+            print("Warning: The value should be an float but"
+                  " is \"{}\"".format(value) + msg)
+            value = float(value)
         if not isinstance(value, float):
+            msg = "."
+            if tbs is not None:
+                msg = " while \"{}\".".format(tbs)
             raise ValueError("The value must be an float but"
-                             " is \"{}\".".format(value))
+                             " is \"{}\"".format(value) + msg)
         if value < self.From:
             self.From = value;
         if value > self.To:
@@ -88,15 +105,15 @@ class GCodeWriter:
         self.NumMovementCommands = 0
         self.NumCharactersWritten = 0
 
-    def WriteLine(command):
+    def WriteLine(self, command):
         if isinstance(command, GCodeCommand):
             command = command.ToString()
-        NumLines += 1
+        self.NumLines += 1
         if GCodeWriter.IsCommand(command):
-            NumCommands += 1
+            self.NumCommands += 1
             if GCodeWriter.IsMovementCommand(command):
-                NumMovementCommands += 1
-        NumCharactersWritten += len(command) + len(os.linesep)
+                self.NumMovementCommands += 1
+        self.NumCharactersWritten += len(command) + len(os.linesep)
         self._underlying.write(command + "\n")
 
     @staticmethod
@@ -134,14 +151,18 @@ class GCodeWriter:
 
 
 class Program:
-
-    FirstTowerZ = 2.1
+    _FirstTowerZ = 2.1
+    _GraphRowHeight = 0.5
     TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    @property
-    def GraphRowHeight(self):
-        return 0.5
+    @staticmethod
+    def get_FirstTowerZ():
+        return Program._FirstTowerZ
+
+    @staticmethod
+    def get_GraphRowHeight():
+        return Program._GraphRowHeight
 
     @staticmethod
     def GetTemplateReader():
@@ -163,6 +184,7 @@ class Program:
         x.To = y.To = z.To = sys.float_info.min
         lastE = sys.float_info.min
         currentZ = sys.float_info.min
+        zTBS = None
 
         # CHECK NEXT LINE for type declarations !!!
         while True:
@@ -178,33 +200,59 @@ class Program:
 
             if command.Command == "G1":
                 if command.HasParameter('X'):
-                    x.Extend(command.GetParameter('X'))
+                    x.Extend(
+                        command.GetParameter('X'),
+                        tbs="on X where line=\"{}\"".format(line)
+                    )
                 if command.HasParameter('Y'):
-                    y.Extend(command.GetParameter('Y'))
+                    y.Extend(
+                        command.GetParameter('Y'),
+                        tbs="on Y where line=\"{}\"".format(line)
+                    )
 
             if (command.Command == "G0") or (command.Command == "G1"):
                 if command.HasParameter('Z'):
                     currentZ = command.GetParameter('Z')
+                    zTBS = ("z originated from line=\"{}\""
+                            "".format(line))
 
                 if command.HasParameter('E'):
                     e = command.GetParameter('E')
 
                     if (e > lastE) and (currentZ != sys.float_info.min):
                         lastE = e
-                        z.Extend(currentZ)
+                        z.Extend(
+                            currentZ,
+                            tbs=("on Z where line=\"{}\" and {}"
+                                 "").format(line, zTBS)
+                        )
 
-        return (x, y, z)
+        class AnonymousClass:
+            pass
+        result = AnonymousClass()
+        result.X = x
+        result.Y = y
+        result.Z = z
+        return result
 
     @classmethod
     def Main(cls, args):
-        extents = Program.MeasureGCode(Program.GetTemplateReader())
+        reader = Program.GetTemplateReader()
+        try:
+            extents = Program.MeasureGCode(reader)
+        finally:
+            reader.close()
 
         print("Template extents:")
 
         print("    From     Centre   To")
-        print("X   {0,5:##0.0}    {1,5:##0.0}    {2,5:##0.0}", extents.X.From, extents.X.Middle, extents.X.To)
-        print("Y   {0,5:##0.0}    {1,5:##0.0}    {2,5:##0.0}", extents.Y.From, extents.Y.Middle, extents.Y.To)
-        print("Z   {0,5:##0.0}    {1,5:##0.0}    {2,5:##0.0}", extents.Z.From, extents.Z.Middle, extents.Z.To)
+        print("X   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+              "".format(extents.X.From, extents.X.Middle, extents.X.To))
+        print("Y   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+              "".format(extents.Y.From, extents.Y.Middle, extents.Y.To))
+        print("Z   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
+              "".format(extents.Z.From, extents.Z.Middle, extents.Z.To))
+
 
         curvePoints = []
 
@@ -217,7 +265,7 @@ class Program:
             curvePoints.append(
                 CurvePoint(
                     PointType = CurvePointType.SameValueUntil,
-                    Z = FirstTowerZ,
+                    Z = Program.get_FirstTowerZ(),
                     Retraction = 2.0,
                 )
             )
@@ -254,7 +302,7 @@ class Program:
                     initialPoint = CurvePoint()
 
                     initialPoint.PointType = CurvePointType.SameValueUntil
-                    initialPoint.Z = FirstTowerZ
+                    initialPoint.Z = Program.get_FirstTowerZ()
                     initialPoint.Retraction = float(args[index + 1])
 
                     curvePoints.append(initialPoint)
@@ -285,8 +333,8 @@ class Program:
 
         if (deltaX != 0) or (deltaY != 0):
             print(
-                "Will translate test print to be centred at ({0:##0.0}"
-                ", {1:##0.0})".format(
+                "Will translate test print to be centred at ({0:.1f}"
+                ", {1:.1f})".format(
                     extents.X.Middle + deltaX,
                     extents.Y.Middle + deltaY,
                 )
@@ -298,11 +346,12 @@ class Program:
         lastCurvePointsPassed = 0
 
         z = 17.0
-        while z >= FirstTowerZ - self.GraphRowHeight:
+        span = Program.get_FirstTowerZ() - Program.get_GraphRowHeight()
+        while z >= span:
             lastExtraRow = False
-            if z < FirstTowerZ:
+            if z < Program.get_FirstTowerZ():
                 lastExtraRow = True
-                z = FirstTowerZ
+                z = Program.get_FirstTowerZ()
             sys.stdout.write("{:.1f}".format(z).rjust(4))
             sys.stdout.write(' ')
             curvePointsPassed = \
@@ -320,7 +369,7 @@ class Program:
             print("")
             if lastExtraRow:
                 break
-            z -= self.GraphRowHeight
+            z -= Program.get_GraphRowHeight()
 
         print("")
         print("Will write output to: {0}".format(outputFileName))
@@ -332,7 +381,7 @@ class Program:
             Program.TranslateGCode(
                 Program.GetTemplateReader(),
                 writer,
-                FirstTowerZ,
+                Program.get_FirstTowerZ(),
                 deltaX,
                 deltaY,
                 curvePoints,
@@ -349,7 +398,7 @@ class Program:
 
             # CHECK NEXT LINE for type declarations !!!
             while True:
-                line = stream.readline()
+                line = reader.readline()
                 if not line:
                     break
                 line = line.rstrip()
@@ -388,7 +437,7 @@ class Program:
 
         # CHECK NEXT LINE for type declarations !!!
         while True:
-            line = stream.readline()
+            line = reader.readline()
             if not line:
                 break
             line = line.rstrip()
@@ -404,7 +453,7 @@ class Program:
                 if command.HasParameter('Z'):
                     z = command.GetParameter('Z')
 
-                    if uniqueZValues.append(z):
+                    if uniqueZValues.add(z):
                         sys.stdout.write('#')
 
                 if z >= firstTowerZ:
@@ -420,11 +469,11 @@ class Program:
                             command.SetParameter('E', lastE - retraction)
 
                             lcdScreenMessage = (
-                                "dE {retraction:0.000} at Z {z:#0.0}"
+                                "dE {retraction:.3f} at Z {z:.1f}"
                             ).format(retraction=retraction, z=z)
                             serialMessage = (
-                                "Retraction {retraction:0.00000}"
-                                " at Z {z:#0.0}"
+                                "Retraction {retraction:.5f}"
+                                " at Z {z:.1f}"
                             ).format(retraction=retraction, z=z)
 
                             gcodeWriter.WriteLine("M117 " + lcdScreenMessage)
@@ -447,11 +496,18 @@ class Program:
         print("- {0} lines".format(gcodeWriter.NumLines))
         print("- {0} commands".format(gcodeWriter.NumCommands))
         print("- {0} movement commands".format(gcodeWriter.NumMovementCommands))
-        print("- {0} unique Z values".format(uniqueZValues.Count))
+        print("- {0} unique Z values".format(len(uniqueZValues)))
         print("- {0} retractions".format(numberOfRetractions))
 
     @staticmethod
     def GetRetractionForZ(z, curvePoints):
+        if isinstance(z, int):
+            msg = "."
+            if tbs is not None:
+                msg = " while \"{}\".".format(tbs)
+            print("Warning: The z should be an float but"
+                  " is \"{}\"".format(z) + msg)
+            z = float(z)
         if not isinstance(z, float):
             raise ValueError("The z must be an float but"
                              " is \"{}\".".format(z))

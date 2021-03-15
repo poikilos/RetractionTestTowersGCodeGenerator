@@ -7,25 +7,14 @@
 # from System.Text import *
 
 from GCodeCommandPartType import GCodeCommandPartType
+from SpaceString import SpaceString
 
 import sys
 
-
-def IsSpace(*args):
-    '''
-    Sequential arguments:
-    1st (args[0]) -- String to check as a whole or as a character
-    2nd (args[1]) -- If present, the second param is the index in
-                     args[0] to check and no other parts of args[0] will
-                     be checked.
-    '''
-    if len(args) == 1:
-        return str.isspace(args[0])
-    elif len(args) == 2:
-        return str.isspace(args[0][args[1]])
-    raise ValueError("IsSpace only takes (charStr)"
-                     " or (str, index)")
-
+from cc0code import (
+    IsSpace,
+    ToNumber,
+)
 
 class GCodeCommandPart:
     '''
@@ -45,6 +34,13 @@ class GCodeCommandPart:
         self.Number = kwargs.get("Number")
         self.Text = kwargs.get("Text")
 
+    def __str__(self):
+        return self.ToString()
+
+    def __repr__(self):
+        # This is used when a list containing this is formatted as text.
+        return self.ToString()
+
     def ToString(self):
         if self.Type == GCodeCommandPartType.Space:
             return SpaceString.OfLength(self.Number)
@@ -62,8 +58,17 @@ class GCodeCommandPart:
             writer.write(SpaceString.OfLength(self.Number))
         elif self.Type == GCodeCommandPartType.CharacterAndNumber:
             writer.write(self.Character)
-            writer.write("%.3g" % self.Number)
+            wholes = len(str(int(self.Number)))
+            want_decimals = 5
+            want_figures = want_decimals + wholes
+            writer.write(
+                ("{:."+str(want_figures)+"g}").format(self.Number)
+            )
+            # writer.write("%.5g" % self.Number)
             # ^ The format was "##0.#####" (# is optional) in C#
+            #   (don't use g since though g makes decimals optional,
+            #   .5g counts 5 INCLUDING before the decimal but we always
+            #   want all 5 if present)
         elif self.Type == GCodeCommandPartType.Comment:
             writer.write(';')
             writer.write(self.Text)
@@ -81,7 +86,7 @@ class GCodeCommandPart:
                     Type=GCodeCommandPartType.Comment,
                     Text=line[index + 1:],
                 )
-                raise StopIteration
+                return
             if IsSpace(line[index]):
                 count = 1
                 index += 1
@@ -102,7 +107,8 @@ class GCodeCommandPart:
                 while ((index < len(line))
                        and not IsSpace(line, index)):
                     index += 1
-                part.Number = float(line[numberStart:index])
+                part.Number = ToNumber(line[numberStart:index])
+
                 yield part
                 wasFirstPart = isFirstPart
                 isFirstPart = False
@@ -128,5 +134,4 @@ class GCodeCommandPart:
                             Type=GCodeCommandPartType.Text,
                             Text=line[index:],
                         )
-                    raise StopIteration
-        # TODO: raise StopIteration?
+                    return

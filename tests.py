@@ -131,6 +131,9 @@ for part in GCodeCommandPart.ParseStringToParts("M70"):
     # i += 1
     # assertEqual(part, good_parts[i])
 assertPartsAllEqual(good_parts, got_parts)
+assertEqual(got_parts[0].ToString(), "M70")
+
+assertEqual(GCodeCommand("M70").ToString(), "M70")
 
 line = "G00 X25 Y20"
 command = GCodeCommand(line)
@@ -139,6 +142,20 @@ assertEqual(command.Command, "G0")
 # beginners/cnc-programming-basics-leading-ttrailing-zeros/)."
 # <https://www.cnctrainingcentre.com/fanuc-turn/g01-g00-basic-cnc-
 # programming/>
+assertEqual(command.GetParameter('G'), 0)
+assert(isinstance(command.GetParameter('G'), int))
+assert(isinstance(command.GetParameter('X'), float))
+# ^ Even if there is no decimal, it should be converted to float.
+assertEqual(command.GetParameter('X'), 25)
+assertEqual(command.GetParameter('Y'), 20)
+
+line="G1 X206.867 Y199.367 E294.62339"
+command = GCodeCommand(line)
+assertEqual(command.Command, "G1")
+assert(isinstance(command.GetParameter('G'), int))
+assert(isinstance(command.GetParameter('X'), float))
+assertEqual(command.GetParameter('X'), 206.867)
+assertEqual(command.GetParameter('E'), 294.62339)
 
 ex = Extent()
 ex.From = 1.0
