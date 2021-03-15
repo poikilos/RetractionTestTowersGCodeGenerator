@@ -11,9 +11,9 @@ def IsWhiteSpace(*args):
                      args[0] to check and no other parts of args[0] will
                      be checked.
     '''
-    if len(args) == 1:
+    if len(args) != 1:
         raise ValueError("IsWhiteSpace only takes (c)"
-                         " or (c, index)")
+                         " or (c, index) but got {}".format(args))
     if len(args[0]) != 1:
         raise ValueError("The 1st param must be a character but is"
                          " \"{}\".".format(param))
