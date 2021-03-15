@@ -145,10 +145,10 @@ class GCodeWriter:
 class Program:
     _FirstTowerZ = 2.1
     _GraphRowHeight = 0.5
-    _DEFAULT_TEMPLATE_NAME = "Retraction Test Towers Template.gcode"
+    _DEFAULT_TEMPLATE_NAME = "RetractionTestTemplate.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
     MODEL_PATH = os.path.join(DATA_DIR, "Model",
-                              "Retraction Test Towers.stl")
+                              "RetractionTestCylinders.stl")
     TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
 
     @staticmethod
