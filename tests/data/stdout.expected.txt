@@ -40,10 +40,10 @@ Z    ? Retraction
 Will write output to: RetractionTest.gcode
 
 Generating G code...
-
+##########################################################################################################################################################################
 
 Output:
-- 1061791 characters
+- 1065503 characters
 - 34182 lines
 - 32649 commands
 - 32179 movement commands
