@@ -11,13 +11,14 @@ def IsWhiteSpace(*args):
                      args[0] to check and no other parts of args[0] will
                      be checked.
     '''
-    if len(args) != 1:
+    if len(args) < 1:
         raise ValueError("IsWhiteSpace only takes (c)"
                          " or (c, index) but got {}".format(args))
-    if len(args[0]) != 1:
-        raise ValueError("The 1st param must be a character but is"
-                         " \"{}\".".format(param))
     if len(args) == 1:
+        if (len(args[0]) != 1):
+            raise ValueError("The 1st argument must be a character if"
+                             " no index is specified as the 2nd"
+                             " argument (args={}).".format(args))
         return str.isspace(args[0])
     elif len(args) == 2:
         return str.isspace(args[0][args[1]])
