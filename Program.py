@@ -154,6 +154,7 @@ class Program:
                               "RetractionTestCylinders.stl")
     TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
     _extents = None
+    _extents_done = False
 
     @staticmethod
     def get_FirstTowerZ():
@@ -249,15 +250,15 @@ class Program:
     def CalculateExtents(cls):
         if not os.path.isfile(cls.TEMPLATE_PATH):
             return False
-        ok = False
+        cls._extents_done = False
         reader = cls.GetTemplateReader()
         try:
             cls._extents = cls.MeasureGCode(reader)
-            ok = True
+            cls._extents_done = True
         finally:
             reader.close()
 
-        if ok:
+        if cls._extents_done:
             print("Template extents:")
 
             print("    From     Centre   To")
@@ -270,7 +271,7 @@ class Program:
             print("Z   {0: >5.1f}    {1: >5.1f}    {2: >5.1f}"
                   "".format(cls._extents.Z.From, cls._extents.Z.Middle,
                             cls._extents.Z.To))
-        return ok
+        return cls._extents_done
 
     @classmethod
     def Main(cls, args):
@@ -282,6 +283,8 @@ class Program:
         deltaY = 0.0
 
         outputFileName = "RetractionTest.gcode"
+        extents_used_by = None
+        center = None
 
         if True:
             index = 0
@@ -297,14 +300,27 @@ class Program:
                     continue
 
                 elif argName == "/center":
-                    deltaX = float(args[index + 1]) - cls._extents.X.Middle
-                    deltaY = float(args[index + 2]) - cls._extents.Y.Middle
+                    if not cls._extents_done:
+                        raise ValueError(Program.getTemplateUsage())
+                    center = (float(args[index + 1]),
+                              float(args[index + 2]))
+                    deltaX = center[0] - cls._extents.X.Middle
+                    deltaY = center[1] - cls._extents.Y.Middle
                     index += 3
+                    extents_used_by = "/center"
                     continue
 
                 elif argName == "/template":
                     cls.TEMPLATE_PATH = args[index + 1]
                     cls.CalculateExtents()
+                    if extents_used_by == "/center":
+                        deltaX = center[0] - cls._extents.X.Middle
+                        deltaY = center[1] - cls._extents.Y.Middle
+                    elif extents_used_by is not None:
+                        raise NotImplementedError(
+                            "The program cannot recalculate the"
+                            " effect of {} after changing the model."
+                        )
                     index += 2
                     continue
 
@@ -335,7 +351,8 @@ class Program:
                     return
 
                 raise Exception("Invalid command-line format")
-        if not os.path.isfile(cls.TEMPLATE_PATH):
+        if (not os.path.isfile(cls.TEMPLATE_PATH)
+                or (not cls._extents_done)):
             raise ValueError(Program.getTemplateUsage())
         if len(curvePoints) == 0:
             curvePoints.append(
