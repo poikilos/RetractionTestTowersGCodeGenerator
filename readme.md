@@ -4,6 +4,10 @@ Generate retraction test towers by varying retraction by z in G-code.
 
 This is Poikilos' Python fork of logiclrd's C# tool (RetractionTestTowersGCodeGenerator).
 
+Sourcecode: https://github.com/poikilos/RetractionTowerProcessor
+
+To test different temperatures you can try: https://github.com/poikilos/TemperatureTowerProcessor
+
 
 ## Measurements
 The test is 25x10 mm.
