@@ -11,7 +11,7 @@ from SpaceString import SpaceString
 
 import sys
 
-from cc0code import (
+from fxshim import (
     IsWhiteSpace,
     decimal_Parse,
     NumberToStr,

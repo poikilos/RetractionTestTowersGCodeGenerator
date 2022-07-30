@@ -7,7 +7,7 @@
 # from System.Linq import *
 import sys
 import os
-from cc0code import (
+from fxshim import (
     IsWhiteSpace,
     decimal_Parse,
     IsNullOrWhiteSpace,

@@ -2,7 +2,7 @@
 
 from GCodeCommandPart import GCodeCommandPart
 
-from cc0code import (
+from fxshim import (
     IsWhiteSpace
 )
 
