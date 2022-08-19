@@ -13,6 +13,7 @@ To test different temperatures you can try: https://github.com/poikilos/Temperat
 - Change to a new more stable tower to facilitate many levels.
   - The base is still 25x10x2 (but not for the "arches" version--see [Alternate towers](#alternate-towers)).
 
+
 ## Measurements
 
 ### Cura
