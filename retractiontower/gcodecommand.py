@@ -8,9 +8,9 @@
 
 import sys
 
-from GCodeCommandPart import GCodeCommandPart
-from GCodeCommandPartType import GCodeCommandPartType
-from CommandCache import CommandCache
+from retractiontower.gcodecommandpart import GCodeCommandPart
+from retractiontower.gcodecommandparttype import GCodeCommandPartType
+from retractiontower.commandcache import CommandCache
 
 
 class GCodeCommand:

@@ -5,13 +5,11 @@
 # from System.Collections.Generic import *
 # from System.IO import *
 # from System.Text import *
-
-from GCodeCommandPartType import GCodeCommandPartType
-from SpaceString import SpaceString
-
 import sys
 
-from fxshim import (
+from retractiontower.gcodecommandparttype import GCodeCommandPartType
+from retractiontower.spacestring import SpaceString
+from retractiontower.fxshim import (
     IsWhiteSpace,
     decimal_Parse,
     NumberToStr,

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-from GCodeCommandPart import GCodeCommandPart
+from retractiontower.gcodecommandpart import GCodeCommandPart
 
-from fxshim import (
+from retractiontower.fxshim import (
     IsWhiteSpace
 )
 
-from GCodeCommand import (
+from retractiontower.gcodecommand import (
     GCodeCommand,
 )
 
-from Program import (
+from retractiontower import (
     Extent,
     CurvePoint,
     CurvePointType,

@@ -7,14 +7,14 @@
 # from System.Linq import *
 import sys
 import os
-from fxshim import (
+from retractiontower.fxshim import (
     IsWhiteSpace,
     decimal_Parse,
     IsNullOrWhiteSpace,
     IsDigit,
 )
-from GCodeCommand import GCodeCommand
-from GCodeCommandPart import GCodeCommandPart
+from retractiontower.gcodecommand import GCodeCommand
+from retractiontower.gcodecommandpart import GCodeCommandPart
 
 class Extent:
     def __init__(self):
@@ -148,11 +148,12 @@ class GCodeWriter:
 class Program:
     _FirstTowerZ = 2.1
     _GraphRowHeight = 0.5
-    _DEFAULT_TEMPLATE_NAME = "RetractionTestTemplate.gcode"
+    _DEFAULT_TEMPLATE_NAME = "Template.gcode"
     DATA_DIR = os.path.dirname(os.path.abspath(__file__))
     MODEL_PATH = os.path.join(DATA_DIR, "Model",
                               "RetractionTestCylinders.stl")
-    TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
+    # TEMPLATE_PATH = os.path.join(DATA_DIR, _DEFAULT_TEMPLATE_NAME)
+    TEMPLATE_PATH = os.path.join(os.getcwd(), _DEFAULT_TEMPLATE_NAME)
     _extents = None
     _extents_done = False
 
@@ -348,7 +349,7 @@ class Program:
 
                 elif argName == "/checkfile":
                     cls.AnalyzeFile(args[index + 1])
-                    return
+                    return 0
 
                 raise Exception("Invalid command-line format")
         if (not os.path.isfile(cls.TEMPLATE_PATH)
@@ -431,6 +432,7 @@ class Program:
 
         print("")
         print(os.path.abspath(outputFileName))
+        return 0
 
     @staticmethod
     def AnalyzeFile(fileName):
@@ -458,6 +460,7 @@ class Program:
                                   "".format(lastE-e, z=z))
                         else:
                             lastE = e
+        return 0
 
     @staticmethod
     def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY, curvePoints):
@@ -581,5 +584,9 @@ class Program:
         return curvePoints[-1].Retraction
 
 
+def main():
+    return Program.Main(sys.argv[1:])
+
+
 if __name__ == "__main__":
-    Program.Main(sys.argv[1:])
+    sys.exit(main())
