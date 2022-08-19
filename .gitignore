@@ -140,3 +140,4 @@ Retraction Test Towers Template.gcode
 *.blend1
 *.tmp
 style-check-output.txt
+/RetractionTest*.gcode

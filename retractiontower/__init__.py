@@ -1,4 +1,21 @@
 ﻿#!/usr/bin/env python
+'''
+Retraction Tower Processor
+--------------------------
+This program processes template gcode to produce RetractionTower.gcode.
+https://github.com/poikilos/RetractionTowerProcessor is a
+Python reinterpretation of logiclrd's C# RetractionTestTowersGCodeGenerator.
+
+Options:
+/output  <path>            Specify where to save the gcode
+                           (default: RetractionTower.gcode).
+/center <x> <y>            Set the middle for calculating extents.
+/template <path>           Choose an input gcode file.
+/startwith <retraction>    Start with this retraction length (default 2).
+/setat <height>            Keep the same retraction up to here (default 2).
+/interpolateto <height>    Interpolate up to here (default 32).
+/checkfile                 Check the file only.
+'''
 # Processed by pycodetool https://github.com/poikilos/pycodetool
 # 2021-03-14 10:52:20
 # from System import *
@@ -15,6 +32,11 @@ from retractiontower.fxshim import (
 )
 from retractiontower.gcodecommand import GCodeCommand
 from retractiontower.gcodecommandpart import GCodeCommandPart
+
+
+def usage():
+    print(__doc__)
+
 
 class Extent:
     def __init__(self):
@@ -46,9 +68,9 @@ class Extent:
             raise ValueError("The value must be an float but"
                              " is \"{}\"".format(value) + msg)
         if value < self.From:
-            self.From = value;
+            self.From = value
         if value > self.To:
-            self.To = value;
+            self.To = value
 
 
 # enum CurvePointType
@@ -68,8 +90,8 @@ class CurvePoint:
         self.Retraction = kwargs.get('Retraction')
 
     @staticmethod
-    def compare(l, r):
-        return l.Z - r.Z
+    def compare(curvepoint1, curvepoint2):
+        return curvepoint1.Z - curvepoint2.Z
 
     def __lt__(self, other):
         return CurvePoint.compare(self, other) < 0
@@ -188,7 +210,8 @@ class Program:
     @staticmethod
     def MeasureGCode(stream):
         #  Count only G1 moves in X and Y.
-        #  Count G0 and G1 moves in Z, but only for Z values where filament is extruded.
+        #  Count G0 and G1 moves in Z, but only for Z values
+        #    where filament is extruded.
         x = Extent()
         y = Extent()
         z = Extent()
@@ -350,6 +373,9 @@ class Program:
                 elif argName == "/checkfile":
                     cls.AnalyzeFile(args[index + 1])
                     return 0
+                elif argName in ["--help", "/?"]:
+                    usage()
+                    return 0
 
                 raise Exception("Invalid command-line format")
         if (not os.path.isfile(cls.TEMPLATE_PATH)
@@ -358,17 +384,17 @@ class Program:
         if len(curvePoints) == 0:
             curvePoints.append(
                 CurvePoint(
-                    PointType = CurvePointType.SameValueUntil,
-                    Z = cls.get_FirstTowerZ(),
-                    Retraction = 2.0,
+                    PointType=CurvePointType.SameValueUntil,
+                    Z=cls.get_FirstTowerZ(),
+                    Retraction=2.0,
                 )
             )
 
             curvePoints.append(
                 CurvePoint(
-                    PointType = CurvePointType.InterpolateUpTo,
-                    Z = cls._extents.Z.To,
-                    Retraction = 3.0,
+                    PointType=CurvePointType.InterpolateUpTo,
+                    Z=cls._extents.Z.To,
+                    Retraction=3.0,
                 )
             )
 
@@ -388,7 +414,8 @@ class Program:
 
         lastCurvePointsPassed = 0
 
-        z = 17.0
+        # z = 17.0  # for original
+        z = 32.0
         span = cls.get_FirstTowerZ() - cls.get_GraphRowHeight()
         while z >= span:
             lastExtraRow = False
@@ -463,7 +490,8 @@ class Program:
         return 0
 
     @staticmethod
-    def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY, curvePoints):
+    def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY,
+                       curvePoints):
         if not isinstance(firstTowerZ, float):
             raise ValueError("The firstTowerZ must be an float but"
                              " is \"{}\".".format(firstTowerZ))
@@ -491,9 +519,15 @@ class Program:
 
             if (command.Command == "G0") or (command.Command == "G1"):
                 if command.HasParameter('X'):
-                    command.SetParameter('X', command.GetParameter('X') + deltaX)
+                    command.SetParameter(
+                        'X',
+                        command.GetParameter('X') + deltaX
+                    )
                 if command.HasParameter('Y'):
-                    command.SetParameter('Y', command.GetParameter('Y') + deltaY)
+                    command.SetParameter(
+                        'Y',
+                        command.GetParameter('Y') + deltaY
+                    )
 
                 if command.HasParameter('Z'):
                     z = command.GetParameter('Z')
@@ -509,7 +543,10 @@ class Program:
                             #  Retraction!
                             numberOfRetractions += 1
 
-                            retraction = Program.GetRetractionForZ(z, curvePoints)
+                            retraction = Program.GetRetractionForZ(
+                                z,
+                                curvePoints
+                            )
 
                             command.SetParameter('E', lastE - retraction)
 

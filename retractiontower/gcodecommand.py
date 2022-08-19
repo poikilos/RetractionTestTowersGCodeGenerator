@@ -61,7 +61,7 @@ class GCodeCommand:
             writer.write(part)
 
     def HasParameter(self, v):
-        return self.GetPartByCharacter(v) is not None\
+        return self.GetPartByCharacter(v) is not None
 
     def GetParameter(self, param):
         part = self.GetPartByCharacter(param)
@@ -72,7 +72,6 @@ class GCodeCommand:
                             "".format(param))
 
         return part.Number
-
 
     def SetParameter(self, param, value):
         part = self.GetPartByCharacter(param)

@@ -30,7 +30,8 @@ class GCodeCommandPart:
             GCodeCommandPartType.Comment
     '''
     COMMENT_MARKS = [';', '//']
-    F_PARAMS = "XY" #ZE"  # always convert to float
+    F_PARAMS = "XY"  # ZE"  # always convert to float
+
     def __init__(self, **kwargs):
         self.Type = kwargs.get("Type")
         self.Character = kwargs.get("Character")
@@ -146,7 +147,6 @@ class GCodeCommandPart:
                 except Exception as ex:
                     print("line: `{}`".format(line))
                     raise ex
-
 
                 yield part
                 wasFirstPart = isFirstPart

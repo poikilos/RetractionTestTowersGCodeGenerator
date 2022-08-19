@@ -9,8 +9,14 @@ Sourcecode: https://github.com/poikilos/RetractionTowerProcessor
 To test different temperatures you can try: https://github.com/poikilos/TemperatureTowerProcessor
 
 
+## Differences in Poikilos' Python fork
+- Change to a new more stable tower to facilitate many levels.
+- Change the tower to have many levels (formerly 25x10 mm base)
+  - levels: 5, 15, 25, 35, 45, 55, 65 (top)
+
+
 ## Measurements
-The test is 25x10 mm.
+25x25x65
 
 ### Cura
 Cura places it at the center and changes the origin to the center.
