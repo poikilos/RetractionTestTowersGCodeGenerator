@@ -510,6 +510,7 @@ class Program:
         numberOfRetractions = 0
 
         line_n = 0
+        is_relative = False
         while True:
             line_n += 1
             line = reader.readline()
@@ -549,8 +550,15 @@ class Program:
                                 z,
                                 curvePoints
                             )
-
-                            command.SetParameter('E', lastE - retraction)
+                            if is_relative:
+                                # Don't change relative extrusion
+                                #   such as end G-code.
+                                newE = retraction
+                                if e < 0:
+                                    newE *= -1.0
+                            else:
+                                newE = lastE - retraction
+                            command.SetParameter('E', newE)
 
                             lcdScreenMessage = (
                                 "dE {retraction:.3f} at Z {z:.1f}"
@@ -568,6 +576,10 @@ class Program:
                                 lastSerialMessage = serialMessage
 
                         lastE = e
+            elif command.Command == "G91":
+                is_relative = True
+            elif command.Command == "G90":
+                is_relative = False
 
             gcodeWriter.WriteLine(command)
 
@@ -619,7 +631,6 @@ class Program:
                 return interpolateFrom * weightFrom + interpolateTo * weightTo
 
             previousPoint = point
-
         return curvePoints[-1].Retraction
 
 
