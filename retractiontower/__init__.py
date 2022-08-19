@@ -40,6 +40,14 @@ def usage():
     print(__doc__)
 
 
+def peek_line(f):
+    # as per <https://stackoverflow.com/a/16840747/4541104>
+    pos = f.tell()
+    line = f.readline()
+    f.seek(pos)
+    return line
+
+
 class Extent:
     def __init__(self):
         self.From = 0.0
@@ -628,7 +636,17 @@ class Program:
                 weightTo = (z - previousPoint.Z) / interpolateRange
                 weightFrom = (point.Z - z) / interpolateRange
 
-                return interpolateFrom * weightFrom + interpolateTo * weightTo
+                result = interpolateFrom * weightFrom + interpolateTo * weightTo
+                if result > interpolateTo:
+                    print(
+                        'Warning: result {} > interpolateTo {}'
+                        ' (interpolateRange={}, interpolateToZ={}, z={},'
+                        ' weightFrom={}, weightTo={})'
+                        ''.format(result, interpolateTo, interpolateRange,
+                                  interpolateToZ, z, weightFrom, weightTo)
+                    )
+
+                return result
 
             previousPoint = point
         return curvePoints[-1].Retraction
