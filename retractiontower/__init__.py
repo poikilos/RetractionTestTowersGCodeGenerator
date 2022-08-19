@@ -12,8 +12,10 @@ Options:
 /center <x> <y>            Set the middle for calculating extents.
 /template <path>           Choose an input gcode file.
 /startwith <retraction>    Start with this retraction length (default 2).
-/setat <height>            Keep the same retraction up to here (default 2).
-/interpolateto <height>    Interpolate up to here (default 32).
+/setat <z>                 Keep the same retraction up to here (default 2).
+/interpolateto <z> <retr.> Interpolate up to here and to this retraction
+                           (default z=32,
+                           default retraction startwith + .5 per mm).
 /checkfile                 Check the file only.
 '''
 # Processed by pycodetool https://github.com/poikilos/pycodetool
