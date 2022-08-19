@@ -11,12 +11,9 @@ To test different temperatures you can try: https://github.com/poikilos/Temperat
 
 ## Differences in Poikilos' Python fork
 - Change to a new more stable tower to facilitate many levels.
-- Change the tower to have many levels (formerly 25x10 mm base)
-  - levels: 5, 15, 25, 35, 45, 55, 65 (top)
-
+  - The base is still 25x10x2 (but not for the "arches" version--see [Alternate towers](#alternate-towers)).
 
 ## Measurements
-25x25x65
 
 ### Cura
 Cura places it at the center and changes the origin to the center.
@@ -33,3 +30,11 @@ Therefore:
     - retraction 3 (Cura's default is 5)
     - retraction speed 40 (Cura's default is 45)
     - for other settings, see tests/data
+
+
+## Development
+### Alternate towers
+The "arches" version has discreet levels:
+- It has a 25x25x5 mm base.
+- The code accounts for the extents automatically (See `cls.MeasureGCode(reader)`) but not the base height (and not top?).
+- levels: 5 (height of the base; Use the `/setat 5` option to account for this), 15, 25, 35, 45, 55, 65 (top of highest level)
