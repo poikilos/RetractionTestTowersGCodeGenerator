@@ -591,8 +591,6 @@ class Program:
 
             gcodeWriter.WriteLine(command)
 
-        gcodeWriter.WriteLine("G0 X0 Y0")
-
         print("")
         print("")
         print("Output:")
