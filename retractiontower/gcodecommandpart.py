@@ -14,6 +14,7 @@ from retractiontower.fxshim import (
     decimal_Parse,
     NumberToStr,
     IsNullOrWhiteSpace,
+    optionalD,
 )
 
 
@@ -51,7 +52,7 @@ class GCodeCommandPart:
             return SpaceString.OfLength(self.Number)
         elif self.Type == GCodeCommandPartType.CharacterAndNumber:
             if self.Character in GCodeCommandPart.F_PARAMS:
-                return self.Character + str(float(self.Number))
+                return self.Character + optionalD(float(self.Number), 3).format(float(self.Number))
             return self.Character + NumberToStr(self.Number)
         elif self.Type == GCodeCommandPartType.Comment:
             commentMark = self.CommentMark
@@ -71,9 +72,10 @@ class GCodeCommandPart:
             wholes = len(str(int(self.Number)))
             want_decimals = 5
             want_figures = want_decimals + wholes
-            writer.write(
-                ("{:."+str(want_figures)+"g}").format(self.Number)
-            )
+            # writer.write(
+            #     ("{:."+str(want_figures)+"g}").format(self.Number)
+            # )
+            writer.write(optionalD(self.Number, want_decimals).format(self.Number))
             # writer.write("%.5g" % self.Number)
             # ^ The format was "##0.#####" (# is optional) in C#
             #   (don't use g since though g makes decimals optional,
