@@ -6,7 +6,9 @@ This is Poikilos' Python fork of logiclrd's C# tool (RetractionTestTowersGCodeGe
 
 Sourcecode: https://github.com/poikilos/RetractionTowerProcessor
 
-To test different temperatures you can try: https://github.com/poikilos/TemperatureTowerProcessor
+You can calibrate further using my related projects:
+- [TemperatureTowerProcessor](https://github.com/poikilos/TemperatureTowerProcessor)
+- [LinearAdvanceTowerGenerator](https://github.com/poikilos/LinearAdvanceTowerGenerator)
 
 
 ## Differences in Poikilos' Python fork
