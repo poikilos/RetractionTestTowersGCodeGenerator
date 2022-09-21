@@ -16,6 +16,8 @@ Options:
 /interpolateto <z> <retr.> Interpolate up to here and to this retraction
                            (default z=32,
                            default retraction startwith + .5 per mm).
+/interpolate <retr.>       Interpolate up to this retraction
+                           (to z=32).
 /checkfile                 Check the file only.
 '''
 # Processed by pycodetool https://github.com/poikilos/pycodetool
@@ -36,8 +38,46 @@ from retractiontower.gcodecommand import GCodeCommand
 from retractiontower.gcodecommandpart import GCodeCommandPart
 
 
+verbosity = 0
+verbosities = [True, False, 0, 1, 2]
+
+
+def set_verbosity(level):
+    global verbosity
+    if level not in verbosities:
+        raise ValueError("level must be one of {}".format(verbosities))
+    verbosity = level
+
+
+def echo0(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+    return True
+
+
+def echo1(*args, **kwargs):
+    if verbosity < 1:
+        return False
+    print(*args, file=sys.stderr, **kwargs)
+    return True
+
+
+def echo2(*args, **kwargs):
+    if verbosity < 2:
+        return False
+    print(*args, file=sys.stderr, **kwargs)
+    return True
+
+
 def usage():
     print(__doc__)
+
+
+def isfloat(num):
+    try:
+        float(num)
+        return True
+    except ValueError:
+        return False
 
 
 def peek_line(f):
@@ -319,7 +359,11 @@ class Program:
         outputFileName = "RetractionTest.gcode"
         extents_used_by = None
         center = None
-
+        last_retraction = 2.0
+        default_height = 32.0
+        start_point_done = False
+        start_point_done_flags = ["/startwith", "/setat"]
+        prevArgName = None
         if True:
             index = 0
 
@@ -327,7 +371,9 @@ class Program:
                 curvePoint = CurvePoint()
 
                 argName = args[index].lower()
-
+                if prevArgName in start_point_done_flags:
+                    start_point_done = True
+                prevArgName = argName
                 if argName == "/output":
                     outputFileName = args[index + 1]
                     index += 2
@@ -368,16 +414,50 @@ class Program:
                     continue
 
                 elif ((argName == "/setat")
-                        or (argName == "/interpolateto")):
+                        or (argName == "/interpolateto")
+                        or (argName == "/interpolate")):
                     if argName == "/setat":
                         curvePoint.PointType = CurvePointType.SameValueUntil
                     else:
                         curvePoint.PointType = CurvePointType.InterpolateUpTo
+                        # prevent divide by zero:
+                        if not start_point_done:
+                            echo0("Error: You must use one of {} first."
+                                  "".format(start_point_done_flags))
+                            return 1
 
-                    curvePoint.Z = float(args[index + 1])
-                    curvePoint.Retraction = float(args[index + 2])
+                    if argName == "/setat":
+                        curvePoint.Z = float(args[index + 1])
+                        curvePoint.Retraction = last_retraction
+                        index += 2
+                    elif argName == "/interpolateto":
+                        curvePoint.Z = float(args[index + 1])
+                        if len(args) <= index + 2:
+                            usage()
+                            echo0("Error: You must specify both"
+                                  " <height> and <Retraction>. If you only"
+                                  " want to set retraction"
+                                  " (assuming Z {} as the height),"
+                                  " use /interpolate."
+                                  "".format(default_height))
+                            return 1
+                        if not isfloat(args[index + 2]):
+                            usage()
+                            echo0('Error: You must specify a number'
+                                  ' for Retraction after Z but "{}"'
+                                  ' is not a number.'.format(args[index + 2]))
+                            return 1
+                        curvePoint.Retraction = float(args[index + 2])
+                        last_retraction = curvePoint.Retraction
+                        index += 3
+                    elif argName == "/interpolate":
+                        curvePoint.Z = default_height
+                        curvePoint.Retraction = float(args[index + 1])
+                        last_retraction = curvePoint.Retraction
+                        index += 2
+                    else:
+                        raise NotImplementedError(argName)
                     curvePoints.append(curvePoint)
-                    index += 3
                     continue
 
                 elif argName == "/checkfile":
@@ -425,7 +505,7 @@ class Program:
         lastCurvePointsPassed = 0
 
         # z = 17.0  # for original
-        z = 32.0
+        z = default_height
         span = cls.get_FirstTowerZ() - cls.get_GraphRowHeight()
         while z >= span:
             lastExtraRow = False
@@ -592,6 +672,8 @@ class Program:
             gcodeWriter.WriteLine(command)
 
         print("")
+        print("")
+        print("See the chart generated above for what measurement (from bottom, not top of base) demonstrates what amount of retraction.")
         print("")
         print("Output:")
         print("- {0} characters".format(gcodeWriter.NumCharactersWritten))
