@@ -22,7 +22,11 @@ class GCodeCommand:
         self.CommandType = None
         self.CommandNumber = None
         try:
-            self._parts = list(GCodeCommandPart.ParseStringToParts(line))
+            self._parts = list(GCodeCommandPart.ParseStringToParts(
+                line,
+                path=path,
+                line_n=line_n,
+            ))
         except ValueError:
             sys.stderr.write(
                 '{}:{}: A non-float was found in "{}"\n'

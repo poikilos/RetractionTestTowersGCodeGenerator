@@ -109,7 +109,7 @@ class GCodeCommandPart:
         return GCodeCommandPart.commentMarkAt(line, i) is not None
 
     @staticmethod
-    def ParseStringToParts(line):
+    def ParseStringToParts(line, path=None, line_n=None):
         results = []
         isFirstPart = True
         index = 0
@@ -146,9 +146,12 @@ class GCodeCommandPart:
                     index += 1
                 try:
                     part.Number = decimal_Parse(line[numberStart:index])
-                except Exception as ex:
-                    print("line: `{}`".format(line))
-                    raise ex
+                except ValueError as ex:
+                    print(
+                        "{}:{}: Error parsing line: `{}` substring `{}`"
+                        "".format(path, line_n, line, line[numberStart:index])
+                    )
+                    raise
 
                 yield part
                 wasFirstPart = isFirstPart
