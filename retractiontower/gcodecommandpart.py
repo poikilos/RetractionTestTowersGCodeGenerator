@@ -54,6 +54,8 @@ class GCodeCommandPart:
             if self.Character in GCodeCommandPart.F_PARAMS:
                 return self.Character + optionalD(float(self.Number), 3).format(float(self.Number))
             return self.Character + NumberToStr(self.Number)
+        elif self.Type == GCodeCommandPartType.Character:
+            return self.Character
         elif self.Type == GCodeCommandPartType.Comment:
             commentMark = self.CommentMark
             if IsNullOrWhiteSpace(self.CommentMark):
@@ -134,6 +136,7 @@ class GCodeCommandPart:
                     Number=count,
                 )
             else:
+                start = index
                 part = GCodeCommandPart(
                     Type=GCodeCommandPartType.CharacterAndNumber,
                     Character=line[index],
@@ -144,14 +147,21 @@ class GCodeCommandPart:
                        and not IsWhiteSpace(line, index)
                        and not GCodeCommandPart.isCommentAt(line, index)):
                     index += 1
-                try:
-                    part.Number = decimal_Parse(line[numberStart:index])
-                except ValueError as ex:
-                    print(
-                        "{}:{}: Error parsing line: `{}` substring `{}`"
-                        "".format(path, line_n, line, line[numberStart:index])
+                numberStr = line[numberStart:index]
+                if len(numberStr) == 0:
+                    part = GCodeCommandPart(
+                        Type=GCodeCommandPartType.Character,
+                        Character=line[start],
                     )
-                    raise
+                else:
+                    try:
+                        part.Number = decimal_Parse(numberStr)
+                    except ValueError as ex:
+                        print(
+                            "{}:{}: Error parsing line: `{}` substring `{}`"
+                            "".format(path, line_n, line, line[numberStart:index])
+                        )
+                        raise
 
                 yield part
                 wasFirstPart = isFirstPart

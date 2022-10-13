@@ -11,3 +11,4 @@ class GCodeCommandPartType:
     CharacterAndNumber = 1
     Comment = 2
     Text = 3
+    Character = 4  # such as "A" in G29 A
