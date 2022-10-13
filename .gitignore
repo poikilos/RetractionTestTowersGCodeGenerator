@@ -141,4 +141,4 @@ Retraction Test Towers Template.gcode
 *.tmp
 style-check-output.txt
 /RetractionTest*.gcode
-nohup.out
+*.out
