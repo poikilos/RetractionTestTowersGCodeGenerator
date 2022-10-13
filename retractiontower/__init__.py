@@ -6,11 +6,21 @@ This program processes template gcode to produce RetractionTower.gcode.
 https://github.com/poikilos/RetractionTowerProcessor is a
 Python reinterpretation of logiclrd's C# RetractionTestTowersGCodeGenerator.
 
+Usage:
+run.py [<path>] [options]
+
+If path is specified, the output file will be named the same except
+with "RetractionTest " prepended (or replacing the word "Template" if
+present in the name).
+
 Options:
 /output  <path>            Specify where to save the gcode
                            (default: RetractionTower.gcode).
 /center <x> <y>            Set the middle for calculating extents.
-/template <path>           Choose an input gcode file.
+/template <path>           Choose an input gcode file (This option is
+                           for backward compatibility. The first
+                           argument without a command switch also sets
+                           the template).
 /startwith <retraction>    Start with this retraction length (default 2).
 /setat <z>                 Keep the same retraction up to here (default 2).
 /interpolateto <z> <retr.> Interpolate up to here and to this retraction
@@ -19,6 +29,7 @@ Options:
 /interpolate <retr.>       Interpolate up to this retraction
                            (to z=32).
 /checkfile                 Check the file only.
+--debug or /debug          Show every retraction at every height.
 '''
 # Processed by pycodetool https://github.com/poikilos/pycodetool
 # 2021-03-14 10:52:20
@@ -28,6 +39,7 @@ Options:
 # from System.Linq import *
 import sys
 import os
+import shutil
 from retractiontower.fxshim import (
     IsWhiteSpace,
     decimal_Parse,
@@ -86,6 +98,11 @@ def peek_line(f):
     line = f.readline()
     f.seek(pos)
     return line
+
+
+def limited_f(f, places=4):
+    places = int(places)
+    return (("{:."+str(places)+"f}").format(f)).rstrip("0").rstrip(".")
 
 
 class Extent:
@@ -258,7 +275,7 @@ class Program:
         return open(Program.TEMPLATE_PATH)
 
     @staticmethod
-    def MeasureGCode(stream):
+    def MeasureGCode(stream, path=None):
         #  Count only G1 moves in X and Y.
         #  Count G0 and G1 moves in Z, but only for Z values
         #    where filament is extruded.
@@ -271,8 +288,9 @@ class Program:
         lastE = sys.float_info.min
         currentZ = sys.float_info.min
         zTBS = None
-
+        line_n = 0
         while True:
+            line_n += 1  # Counting numbers start at 1.
             line = stream.readline()
             if not line:
                 break
@@ -280,8 +298,7 @@ class Program:
 
             if IsNullOrWhiteSpace(line):
                 continue
-
-            command = GCodeCommand(line)
+            command = GCodeCommand(line, path=path, line_n=line_n)
 
             if command.Command == "G1":
                 if command.HasParameter('X'):
@@ -322,12 +339,13 @@ class Program:
 
     @classmethod
     def CalculateExtents(cls):
-        if not os.path.isfile(cls.TEMPLATE_PATH):
+        path = cls.TEMPLATE_PATH
+        if not os.path.isfile(path):
             return False
         cls._extents_done = False
         reader = cls.GetTemplateReader()
         try:
-            cls._extents = cls.MeasureGCode(reader)
+            cls._extents = cls.MeasureGCode(reader, path=path)
             cls._extents_done = True
         finally:
             reader.close()
@@ -348,6 +366,19 @@ class Program:
         return cls._extents_done
 
     @classmethod
+    def set_template(cls, template_path):
+        cls.TEMPLATE_PATH = template_path
+        cls.CalculateExtents()
+        if cls.extents_used_by == "/center":
+            deltaX = center[0] - cls._extents.X.Middle
+            deltaY = center[1] - cls._extents.Y.Middle
+        elif cls.extents_used_by is not None:
+            raise NotImplementedError(
+                "The program cannot recalculate the"
+                " effect of {} after changing the model."
+            )
+
+    @classmethod
     def Main(cls, args):
         cls.CalculateExtents()
 
@@ -357,7 +388,8 @@ class Program:
         deltaY = 0.0
 
         outputFileName = "RetractionTest.gcode"
-        extents_used_by = None
+        inputFileName = None
+        cls.extents_used_by = None
         center = None
         last_retraction = 2.0
         default_height = 32.0
@@ -387,20 +419,12 @@ class Program:
                     deltaX = center[0] - cls._extents.X.Middle
                     deltaY = center[1] - cls._extents.Y.Middle
                     index += 3
-                    extents_used_by = "/center"
+                    cls.extents_used_by = "/center"
                     continue
 
                 elif argName == "/template":
-                    cls.TEMPLATE_PATH = args[index + 1]
-                    cls.CalculateExtents()
-                    if extents_used_by == "/center":
-                        deltaX = center[0] - cls._extents.X.Middle
-                        deltaY = center[1] - cls._extents.Y.Middle
-                    elif extents_used_by is not None:
-                        raise NotImplementedError(
-                            "The program cannot recalculate the"
-                            " effect of {} after changing the model."
-                        )
+                    inputFileName = args[index+1]
+                    cls.set_template(inputFileName)
                     index += 2
                     continue
 
@@ -462,12 +486,30 @@ class Program:
 
                 elif argName == "/checkfile":
                     cls.AnalyzeFile(args[index + 1])
+                    index += 2
                     return 0
                 elif argName in ["--help", "/?"]:
                     usage()
                     return 0
+                elif argName in ["--debug", "/debug"]:
+                    set_verbosity(2)
+                    index += 1
+                    continue
+                elif argName in ["--verbose", "/verbose", "/v", "-v"]:
+                    set_verbosity(1)
+                    index += 1
+                    continue
 
-                raise Exception("Invalid command-line format")
+                elif inputFileName is None:
+                    # must be the *last* case
+                    inputFileName = args[index]
+                    cls.set_template(inputFileName)
+                    index += 1
+                    continue
+
+                raise Exception(
+                    'Error: "{}" is not a valid argument'.format(argName)
+                )
         if (not os.path.isfile(cls.TEMPLATE_PATH)
                 or (not cls._extents_done)):
             raise ValueError(Program.getTemplateUsage())
@@ -489,6 +531,15 @@ class Program:
             )
 
         print("")
+        inputFileName = cls.TEMPLATE_PATH
+        print('Using "{}"'.format(inputFileName))
+        if "Template" in inputFileName:
+            outputFileName = inputFileName.replace("Template",
+                                                   "RetractionTest")
+        else:
+            outputFileName = "RetractionTest " + inputFileName
+        # ^ The name changes more after spans are calculated below.
+
 
         if (deltaX != 0) or (deltaY != 0):
             print(
@@ -507,6 +558,7 @@ class Program:
         # z = 17.0  # for original
         z = default_height
         span = cls.get_FirstTowerZ() - cls.get_GraphRowHeight()
+        pairs = []
         while z >= span:
             lastExtraRow = False
             if z < cls.get_FirstTowerZ():
@@ -524,21 +576,21 @@ class Program:
             retraction = cls.GetRetractionForZ(z, curvePoints)
             sys.stdout.write("{:.4f} ".format(retraction).rjust(8))
             barWidth = int(round(retraction * 5))
-            for i in range(barWidth):
-                sys.stdout.write('*')
+            sys.stdout.write('*'*barWidth)
             print("")
             if lastExtraRow:
                 break
             z -= cls.get_GraphRowHeight()
 
         print("")
-        print("Will write output to: {0}".format(outputFileName))
-
+        # print('Will write output to: "{0}"'.format(outputFileName))
+        # ^ The name is not finalized yet.
+        newFileName = None
         with open(outputFileName, 'w') as writer:
             print("")
             print("Generating G code...")
 
-            cls.TranslateGCode(
+            pairs = cls.TranslateGCode(
                 cls.GetTemplateReader(),
                 writer,
                 cls.get_FirstTowerZ(),
@@ -546,9 +598,25 @@ class Program:
                 deltaY,
                 curvePoints,
             )
+            left, dotExt = os.path.splitext(outputFileName)
+            left += " ("
+            left += "z={},r={}".format(
+                limited_f(pairs[0][0]),
+                limited_f(pairs[0][1])
+            )
+            # if len(pairs) > 2:
+            left += " to z={},r={}".format(
+                limited_f(pairs[-1][0]),
+                limited_f(pairs[-1][1])
+            )
+            left += ")"
+            newFileName = left + dotExt
+        if newFileName is not None:
+            shutil.move(outputFileName, newFileName)
+            outputFileName = newFileName
 
         print("")
-        print(os.path.abspath(outputFileName))
+        print('* wrote "{}"'.format(os.path.abspath(outputFileName)))
         return 0
 
     @staticmethod
@@ -582,6 +650,12 @@ class Program:
     @staticmethod
     def TranslateGCode(reader, writer, firstTowerZ, deltaX, deltaY,
                        curvePoints):
+        '''
+        Returns:
+        a list of (retraction, z) tuples, where the first is the first
+        value, the second is the first one where retraction differs,
+        and the last is the last set changed.
+        '''
         if not isinstance(firstTowerZ, float):
             raise ValueError("The firstTowerZ must be an float but"
                              " is \"{}\".".format(firstTowerZ))
@@ -596,7 +670,7 @@ class Program:
         lastSerialMessage = ""
         gcodeWriter = GCodeWriter(writer)
         numberOfRetractions = 0
-
+        pairs = []
         line_n = 0
         is_relative = False
         while True:
@@ -647,7 +721,22 @@ class Program:
                             else:
                                 newE = lastE - retraction
                             command.SetParameter('E', newE)
-
+                            echo2("* z={:.2f},r={:.4f}".format(z, retraction))
+                            if len(pairs) == 0:
+                                pairs.append((z, retraction))
+                            elif len(pairs) == 1:
+                                # Write the first delta if there is a
+                                #   delta.
+                                if retraction != pairs[0][0]:
+                                    pairs.append((z, retraction))
+                            else:
+                                # Always overwrite the third element,
+                                #   which represents the last value,
+                                #   unless negative (end retraction)
+                                if len(pairs) < 3:
+                                    pairs.append((z, retraction))
+                                else:
+                                    pairs[2] = (z, retraction)
                             lcdScreenMessage = (
                                 "dE {retraction:.3f} at Z {z:.1f}"
                             ).format(retraction=retraction, z=z)
@@ -682,6 +771,7 @@ class Program:
         print("- {0} movement commands".format(gcodeWriter.NumMovementCommands))
         print("- {0} unique Z values".format(len(uniqueZValues)))
         print("- {0} retractions".format(numberOfRetractions))
+        return pairs
 
     @staticmethod
     def GetRetractionForZ(z, curvePoints):

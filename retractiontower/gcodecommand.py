@@ -14,12 +14,22 @@ from retractiontower.commandcache import CommandCache
 
 
 class GCodeCommand:
-    def __init__(self, line):
+    def __init__(self, line, path=None, line_n=None):
         self._line = line  # for debugging only
+        self._line_n = line_n  # for debugging only
+        self._path = path  # for debugging only
         self.Command = None
         self.CommandType = None
         self.CommandNumber = None
-        self._parts = list(GCodeCommandPart.ParseStringToParts(line))
+        try:
+            self._parts = list(GCodeCommandPart.ParseStringToParts(line))
+        except ValueError:
+            sys.stderr.write(
+                '{}:{}: A non-float was found in "{}"\n'
+                ''.format(path, line_n, line)
+            )
+            sys.stderr.flush()
+            raise
         # print("line: `{}`".format(line))
         # print("  parts: {}".format(self._parts))
         firstPart = None
